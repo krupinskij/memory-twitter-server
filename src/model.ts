@@ -15,3 +15,5 @@ export interface RequestError {
   stack?: string;
   authRetry?: boolean;
 }
+
+export { UserV2 as User } from 'twitter-api-v2';
