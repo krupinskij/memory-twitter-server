@@ -16,6 +16,9 @@ const config = {
   CALLBACK: process.env.CALLBACK || '',
   REDIRECT: process.env.REDIRECT || '',
 
+  REDIS_HOSTNAME: process.env.REDIS_HOSTNAME || 'localhost',
+  REDIS_PORT: process.env.REDIS_PORT || 6379,
+
   SESSION_SECRET: process.env.SESSION_SECRET || '',
 } as const;
 
