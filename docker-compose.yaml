@@ -1,0 +1,10 @@
+version: '3.8'
+services:
+  redis:
+    image: redislabs/rejson:2.0.8
+    container_name: mt_redis_c
+    command: redis-server /usr/src/redis/redis.conf --loadmodule /usr/lib/redis/modules/rejson.so
+    ports:
+      - '6379:6379'
+    volumes:
+      - ./redis.conf:/usr/src/redis/redis.conf
