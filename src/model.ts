@@ -16,4 +16,9 @@ export interface RequestError {
   authRetry?: boolean;
 }
 
-export { UserV2 as User } from 'twitter-api-v2';
+export type User = {
+  id: string;
+  username: string;
+  name: string;
+  profilePicture?: string;
+};

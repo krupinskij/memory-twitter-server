@@ -1,4 +1,5 @@
 import { Request, User } from '../../model';
+import { mapUser } from '../../utils';
 
 const me = async (req: Request): Promise<User> => {
   const twitter = req.twitter;
@@ -11,7 +12,7 @@ const me = async (req: Request): Promise<User> => {
     'user.fields': ['name', 'profile_image_url'],
   });
 
-  return twitterMe;
+  return mapUser(twitterMe);
 };
 
 export default {

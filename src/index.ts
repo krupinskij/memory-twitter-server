@@ -1,3 +1,4 @@
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
 import session from 'express-session';
@@ -16,6 +17,8 @@ declare module 'express-session' {
 const { ORIGIN, PORT } = config;
 
 const app = express();
+
+app.use(cookieParser());
 
 app.use(
   session({
