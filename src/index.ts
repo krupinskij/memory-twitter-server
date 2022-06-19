@@ -9,10 +9,12 @@ import user from './api/user';
 import config from './config';
 import redis from './middleware/redis';
 import twitter from './middleware/twitter';
+import { User } from './model';
 
 declare module 'express-session' {
   interface SessionData {
     codeVerifier?: string;
+    me?: User;
   }
 }
 

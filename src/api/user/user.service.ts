@@ -3,6 +3,11 @@ import { mapUser } from '../../utils';
 
 const me = async (req: Request): Promise<User> => {
   const twitter = req.twitter;
+  const { me: sessionMe } = req.session;
+
+  if (sessionMe) {
+    return sessionMe;
+  }
 
   if (!twitter) {
     throw new Error('Nie ma twittera');
@@ -12,7 +17,10 @@ const me = async (req: Request): Promise<User> => {
     'user.fields': ['name', 'profile_image_url'],
   });
 
-  return mapUser(twitterMe);
+  const me = mapUser(twitterMe);
+  req.session.me = me;
+
+  return me;
 };
 
 export default {

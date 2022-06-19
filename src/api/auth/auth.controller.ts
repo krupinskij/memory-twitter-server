@@ -2,6 +2,7 @@ import { TwitterApi } from 'twitter-api-v2';
 
 import config from '../../config';
 import { Request, Response } from '../../model';
+import { mapUser } from '../../utils';
 
 const link = async (req: Request, res: Response) => {
   const twitter = new TwitterApi({
@@ -36,6 +37,13 @@ const callback = async (req: Request, res: Response) => {
       codeVerifier,
       redirectUri: config.CALLBACK,
     });
+
+    const twitterAccess = new TwitterApi(accessToken);
+    const { data: twitterMe } = await twitterAccess.v2.me({
+      'user.fields': ['name', 'profile_image_url'],
+    });
+
+    req.session.me = mapUser(twitterMe);
     res
       .cookie('access-token', accessToken, {
         maxAge: expiresIn * 1000,
