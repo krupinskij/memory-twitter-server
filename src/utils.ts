@@ -8,7 +8,7 @@ export const mapUser = (user: UserV2): User => ({
   un: user.username,
   pp: user.profile_image_url
     ?.replace('https://pbs.twimg.com/profile_images/', '')
-    .replace('_normal.jpg', ''),
+    .replace('_normal', '$'),
 });
 
 export const getRandomIndexes = (count: number, maxIndex: number): number[] => {

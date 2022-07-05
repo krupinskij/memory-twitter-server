@@ -35,7 +35,7 @@ const getFollowings = async (req: Request, id: string): Promise<User[]> => {
   if (cachedFollowingsIds) {
     const cachedFollowings = (await redis?.json.mGet(cachedFollowingsIds, '$')) as User[];
 
-    return cachedFollowings;
+    return cachedFollowings.flatMap((following) => following);
   }
 
   const { data: twitterFollowings } = await twitter.v2.following(id, {
