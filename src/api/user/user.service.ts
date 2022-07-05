@@ -32,7 +32,6 @@ const getFollowings = async (req: Request, id: string): Promise<User[]> => {
   }
 
   const cachedFollowingsIds = (await redis?.json.get(`${id}#followings`)) as string[] | null;
-
   if (cachedFollowingsIds) {
     const cachedFollowings = (await redis?.json.mGet(cachedFollowingsIds, '$')) as User[];
 
@@ -51,7 +50,7 @@ const getFollowings = async (req: Request, id: string): Promise<User[]> => {
   const followingsIds = filteredFollowings.map((following) => following.id);
 
   await redis?.json.set(`${id}#followings`, '$', followingsIds);
-  await redis?.expire('followings', 300);
+  await redis?.expire(`${id}#followings`, 300);
 
   const followingsToCache = twitterFollowings.map(mapUser);
   for (let i = 0; i < followingsToCache.length; i++) {

@@ -4,9 +4,11 @@ import { Level, User } from './model';
 
 export const mapUser = (user: UserV2): User => ({
   id: user.id,
-  name: user.name,
-  username: user.username,
-  profilePicture: user.profile_image_url?.replace('normal', '200x200'),
+  nm: user.name,
+  un: user.username,
+  pp: user.profile_image_url
+    ?.replace('https://pbs.twimg.com/profile_images/', '')
+    .replace('_normal.jpg', ''),
 });
 
 export const getRandomIndexes = (count: number, maxIndex: number): number[] => {

@@ -20,9 +20,9 @@ export interface RequestError {
 
 export type User = {
   id: string;
-  username: string;
-  name: string;
-  profilePicture?: string;
+  un: string;
+  nm: string;
+  pp?: string;
 };
 
 export enum Level {
