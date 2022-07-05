@@ -1,7 +1,5 @@
-import { stringify } from 'querystring';
-
 import { Request, User } from '../../model';
-import { getRandomIndexes, mapUser } from '../../utils';
+import { mapUser } from '../../utils';
 
 const me = async (req: Request): Promise<User> => {
   const twitter = req.twitter;
@@ -33,25 +31,34 @@ const getFollowings = async (req: Request, id: string): Promise<User[]> => {
     throw new Error('Nie ma twittera');
   }
 
+  const cachedFollowingsIds = (await redis?.json.get(`${id}#followings`)) as string[] | null;
+
+  if (cachedFollowingsIds) {
+    const cachedFollowings = (await redis?.json.mGet(cachedFollowingsIds, '$')) as User[];
+
+    return cachedFollowings;
+  }
+
   const { data: twitterFollowings } = await twitter.v2.following(id, {
     'user.fields': ['name', 'profile_image_url'],
   });
 
+  // filter out followings without images
   const filteredFollowings = twitterFollowings
     .filter((following) => !!following.profile_image_url)
     .map((following) => mapUser(following));
 
   const followingsIds = filteredFollowings.map((following) => following.id);
-  const followingsObj = filteredFollowings.reduce<Record<string, User>>((acc, curr) => {
-    acc[curr.id] = curr;
-    return acc;
-  }, {});
 
-  await redis?.json.set('users', '$', followingsObj);
-  await redis?.expire('users', 300);
-
-  await redis?.json.set('followings', `$.${id}`, followingsIds);
+  await redis?.json.set(`${id}#followings`, '$', followingsIds);
   await redis?.expire('followings', 300);
+
+  const followingsToCache = twitterFollowings.map(mapUser);
+  for (let i = 0; i < followingsToCache.length; i++) {
+    const following = followingsToCache[i];
+    await redis?.json.set(following.id, '$', following);
+    await redis?.expire(following.id, 300);
+  }
 
   return filteredFollowings;
 };

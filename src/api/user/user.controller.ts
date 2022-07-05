@@ -12,11 +12,8 @@ const me = async (req: Request, res: Response) => {
 };
 
 const getFollowings = async (req: Request, res: Response) => {
-  console.log('hello');
   try {
     const { level } = req.query;
-
-    console.log(level);
 
     if (!isValidLevel(level)) {
       throw new Error('Nie ma takiego levela');
