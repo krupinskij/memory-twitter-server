@@ -1,5 +1,6 @@
 import { Request as ExpressRequest, Response as ExpressResponse } from 'express';
 import * as core from 'express-serve-static-core';
+import { Connection } from 'mysql2/promise';
 import { RedisClientType } from 'redis';
 import { TwitterApi } from 'twitter-api-v2';
 
@@ -7,6 +8,7 @@ export interface Request<ReqBody = any, ReqParams = core.ParamsDictionary>
   extends ExpressRequest<ReqParams, any, ReqBody, qs.ParsedQs, Record<string, any>> {
   twitter?: TwitterApi;
   redis?: RedisClientType;
+  mysql?: Connection;
 }
 
 export interface Response<ResBody = any>

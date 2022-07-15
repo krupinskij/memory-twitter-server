@@ -20,6 +20,11 @@ const config = {
   REDIS_PORT: process.env.REDIS_PORT || 6379,
 
   SESSION_SECRET: process.env.SESSION_SECRET || '',
+
+  MYSQL_HOSTNAME: process.env.MYSQL_HOSTNAME || 'localhost',
+  MYSQL_USER: process.env.MYSQL_USER || 'user',
+  MYSQL_DATABASE: process.env.MYSQL_DATABASE || '',
+  MYSQL_PASSWORD: process.env.MYSQL_PASSWORD || '',
 } as const;
 
 export default config;
