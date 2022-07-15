@@ -13,6 +13,7 @@ services:
       - '3306:3306'
     volumes:
       - db:/var/lib/mysql
+      - ./scripts:/docker-entrypoint-initdb.d
   redis:
     image: redislabs/rejson:2.0.8
     container_name: mt_redis_c
