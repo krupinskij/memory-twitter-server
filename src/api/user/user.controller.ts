@@ -1,5 +1,6 @@
 import { MapLevel, Request, Response } from '../../model';
 import { getRandomIndexes, isValidLevel } from '../../utils';
+import { QueryLevel } from './user.model';
 import userService from './user.service';
 
 const me = async (req: Request, res: Response) => {
@@ -11,7 +12,7 @@ const me = async (req: Request, res: Response) => {
   }
 };
 
-const getFollowings = async (req: Request, res: Response) => {
+const getFollowings = async (req: Request<any, QueryLevel>, res: Response) => {
   try {
     const { level } = req.query;
 

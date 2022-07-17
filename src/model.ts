@@ -4,8 +4,8 @@ import { Connection } from 'mysql2/promise';
 import { RedisClientType } from 'redis';
 import { TwitterApi } from 'twitter-api-v2';
 
-export interface Request<ReqBody = any, ReqParams = core.ParamsDictionary>
-  extends ExpressRequest<ReqParams, any, ReqBody, qs.ParsedQs, Record<string, any>> {
+export interface Request<ReqBody = any, ReqQuery = qs.ParsedQs, ReqParams = core.ParamsDictionary>
+  extends ExpressRequest<ReqParams, any, ReqBody, ReqQuery, Record<string, any>> {
   twitter?: TwitterApi;
   redis?: RedisClientType;
   mysql?: Connection;
