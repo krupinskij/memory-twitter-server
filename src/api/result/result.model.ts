@@ -1,7 +1,7 @@
 import { Level } from '../../model';
 
 export type UserResult = {
-  timeElapsed: number;
+  time: number;
   clicks: number;
 };
 
