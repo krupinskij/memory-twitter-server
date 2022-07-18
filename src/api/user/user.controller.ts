@@ -23,7 +23,7 @@ const getFollowings = async (req: Request<any, QueryLevel>, res: Response) => {
     const followingsToRead = MapLevel[level];
 
     const me = await userService.me(req);
-    const followings = await userService.getFollowings(req, me.id);
+    const followings = await userService.getFollowings(req, me.id, true);
     const followingsLength = followings.length;
 
     if (followingsLength < followingsToRead) {

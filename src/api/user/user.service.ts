@@ -23,7 +23,7 @@ const me = async (req: Request): Promise<User> => {
   return me;
 };
 
-const getFollowings = async (req: Request, id: string): Promise<User[]> => {
+const getFollowings = async (req: Request, id: string, filtered: boolean): Promise<User[]> => {
   const twitter = req.twitter;
   const redis = req.redis;
 
@@ -34,8 +34,13 @@ const getFollowings = async (req: Request, id: string): Promise<User[]> => {
   const cachedFollowingsIds = (await redis?.json.get(`${id}#followings`)) as string[] | null;
   if (cachedFollowingsIds) {
     const cachedFollowings = (await redis?.json.mGet(cachedFollowingsIds, '$')) as User[];
+    const mappedFollowings = cachedFollowings.flatMap((following) => following);
 
-    return cachedFollowings.flatMap((following) => following);
+    if (filtered) {
+      return mappedFollowings.filter((following) => !!following.pp);
+    }
+
+    return mappedFollowings;
   }
 
   const { data: twitterFollowings } = await twitter.v2.following(id, {
@@ -59,7 +64,7 @@ const getFollowings = async (req: Request, id: string): Promise<User[]> => {
     await redis?.expire(following.id, 300);
   }
 
-  return filteredFollowings;
+  return filtered ? filteredFollowings : followingsToCache;
 };
 
 export default {
