@@ -7,8 +7,25 @@ export type UserResult = {
   clicks: number;
 };
 
-export type QueryLevel = {
+export enum Order {
+  Clicks = 'clicks',
+  Time = 'time',
+}
+
+export enum Users {
+  Together = 'together',
+  OnlyMe = 'onlyme',
+  OnlyFollowings = 'onlyfollowings',
+}
+
+export type AddResultQuery = {
   level: Level;
+};
+
+export type GetResultQuery = {
+  level: Level;
+  order: Order;
+  users: Users;
 };
 
 export type ResultDB = RowDataPacket & {

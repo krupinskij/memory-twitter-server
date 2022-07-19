@@ -1,11 +1,18 @@
 import dayjs from 'dayjs';
-import { RowDataPacket } from 'mysql2';
 
 import { Request, Response } from '../../model';
 import userService from '../user/user.service';
-import { QueryLevel, Result, ResultDB, UserResult } from './result.model';
+import {
+  AddResultQuery,
+  GetResultQuery,
+  Order,
+  Result,
+  ResultDB,
+  UserResult,
+  Users,
+} from './result.model';
 
-const addResult = async (req: Request<UserResult, QueryLevel>, res: Response) => {
+const addResult = async (req: Request<UserResult, AddResultQuery>, res: Response) => {
   try {
     const { clicks, time } = req.body;
     const { level } = req.query;
@@ -31,9 +38,9 @@ const addResult = async (req: Request<UserResult, QueryLevel>, res: Response) =>
   }
 };
 
-const getResults = async (req: Request<any, QueryLevel>, res: Response) => {
+const getResults = async (req: Request<any, GetResultQuery>, res: Response) => {
   try {
-    const { level } = req.query;
+    const { level, order, users: who } = req.query;
     const mysql = req.mysql;
 
     if (!mysql) {
@@ -43,24 +50,45 @@ const getResults = async (req: Request<any, QueryLevel>, res: Response) => {
     const me = await userService.me(req);
     const followings = await userService.getFollowings(req, me.id, false);
 
-    const followingsMap = new Map(followings.map((following) => [following.id, following]));
-    followingsMap.set(me.id, me);
+    let users = [];
+    switch (who) {
+      case Users.OnlyMe:
+        users = [me];
+        break;
+      case Users.OnlyFollowings:
+        users = followings;
+        break;
+      case Users.Together:
+        users = [...followings, me];
+        break;
+    }
 
-    const ids = followings.map((following) => following.id);
-    ids.push(me.id);
+    let orderStatement = '';
+    switch (order) {
+      case Order.Clicks:
+        orderStatement = 'ORDER BY clicks, time, createdAt';
+        break;
+      case Order.Time:
+        orderStatement = 'ORDER BY time, clicks, createdAt';
+        break;
+    }
+
+    const usersMap = new Map(users.map((user) => [user.id, user]));
+    const ids = users.map((user) => user.id);
 
     const [results] = await mysql.execute<ResultDB[]>(
       `
         SELECT BIN_TO_UUID(id) as id, userId, clicks, time, createdAt 
         FROM result_${level} 
         WHERE userId IN (${ids.join(',')})
+        ${orderStatement}
       `
     );
 
     const rankingResults = results.map((result) => {
       const rankingResult: Result = {
         ...result,
-        user: followingsMap.get(result.userId) || me,
+        user: usersMap.get(result.userId) || me,
       };
       delete rankingResult.userId;
 
