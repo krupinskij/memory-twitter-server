@@ -26,6 +26,7 @@ export type GetResultQuery = {
   level: Level;
   order: Order;
   users: Users;
+  lastItem?: string;
 };
 
 export type ResultDB = RowDataPacket & {

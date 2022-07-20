@@ -2,15 +2,8 @@ import dayjs from 'dayjs';
 
 import { Request, Response } from '../../model';
 import userService from '../user/user.service';
-import {
-  AddResultQuery,
-  GetResultQuery,
-  Order,
-  Result,
-  ResultDB,
-  UserResult,
-  Users,
-} from './result.model';
+import { AddResultQuery, GetResultQuery, Result, UserResult, Users } from './result.model';
+import resultService from './result.service';
 
 const addResult = async (req: Request<UserResult, AddResultQuery>, res: Response) => {
   try {
@@ -40,7 +33,7 @@ const addResult = async (req: Request<UserResult, AddResultQuery>, res: Response
 
 const getResults = async (req: Request<any, GetResultQuery>, res: Response) => {
   try {
-    const { level, order, users: who } = req.query;
+    const { users: who, lastItem: lastResultId } = req.query;
     const mysql = req.mysql;
 
     if (!mysql) {
@@ -49,6 +42,8 @@ const getResults = async (req: Request<any, GetResultQuery>, res: Response) => {
 
     const me = await userService.me(req);
     const followings = await userService.getFollowings(req, me.id, false);
+
+    const lastResult = lastResultId ? await resultService.findResultById(req, lastResultId) : null;
 
     let users = [];
     switch (who) {
@@ -63,28 +58,12 @@ const getResults = async (req: Request<any, GetResultQuery>, res: Response) => {
         break;
     }
 
-    let orderStatement = '';
-    switch (order) {
-      case Order.Clicks:
-        orderStatement = 'ORDER BY clicks, time, createdAt';
-        break;
-      case Order.Time:
-        orderStatement = 'ORDER BY time, clicks, createdAt';
-        break;
-    }
+    const ids = users.map((user) => user.id);
+    const results = lastResult
+      ? await resultService.findResultsByIdsAfterResult(req, ids, lastResult)
+      : await resultService.findResultsByIds(req, ids);
 
     const usersMap = new Map(users.map((user) => [user.id, user]));
-    const ids = users.map((user) => user.id);
-
-    const [results] = await mysql.execute<ResultDB[]>(
-      `
-        SELECT BIN_TO_UUID(id) as id, userId, clicks, time, createdAt 
-        FROM result_${level} 
-        WHERE userId IN (${ids.join(',')})
-        ${orderStatement}
-      `
-    );
-
     const rankingResults = results.map((result) => {
       const rankingResult: Result = {
         ...result,
