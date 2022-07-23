@@ -9,6 +9,7 @@ const twitter = async (req: Request, res: Response, next: NextFunction) => {
   const refreshToken = req.cookies['refresh-token'];
 
   if (!accessToken && !refreshToken) {
+    delete req.twitter;
     return next();
   }
 
@@ -27,7 +28,7 @@ const twitter = async (req: Request, res: Response, next: NextFunction) => {
     req.twitter = refreshedClient;
     res
       .cookie('access-token', newAccessToken, {
-        maxAge: expiresIn,
+        maxAge: expiresIn * 1000,
         httpOnly: true,
         secure: true,
       })

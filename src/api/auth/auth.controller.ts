@@ -46,7 +46,7 @@ const callback = async (req: Request, res: Response) => {
     req.session.me = mapUser(twitterMe);
     res
       .cookie('access-token', accessToken, {
-        maxAge: expiresIn,
+        maxAge: expiresIn * 1000,
         httpOnly: true,
         secure: true,
       })
