@@ -1,3 +1,4 @@
+import { UnauthorizedException } from '../../exception';
 import { Request, User } from '../../model';
 import { mapUser } from '../../utils';
 
@@ -5,12 +6,12 @@ const me = async (req: Request): Promise<User> => {
   const twitter = req.twitter;
   const { me: sessionMe } = req.session;
 
-  if (sessionMe) {
-    return sessionMe;
+  if (!twitter) {
+    throw new UnauthorizedException('Nie jesteś zalogowany');
   }
 
-  if (!twitter) {
-    throw new Error('Nie ma twittera');
+  if (sessionMe) {
+    return sessionMe;
   }
 
   const { data: twitterMe } = await twitter.v2.me({
@@ -28,7 +29,7 @@ const getFollowings = async (req: Request, id: string, filtered: boolean): Promi
   const redis = req.redis;
 
   if (!twitter) {
-    throw new Error('Nie ma twittera');
+    throw new UnauthorizedException('Nie jesteś zalogowany');
   }
 
   const cachedFollowingsIds = (await redis?.json.get(`${id}#followings`)) as string[] | null;

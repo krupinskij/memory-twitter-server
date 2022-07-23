@@ -46,7 +46,7 @@ const callback = async (req: Request, res: Response) => {
     req.session.me = mapUser(twitterMe);
     res
       .cookie('access-token', accessToken, {
-        maxAge: expiresIn * 1000,
+        maxAge: expiresIn,
         httpOnly: true,
         secure: true,
       })
@@ -63,7 +63,7 @@ const callback = async (req: Request, res: Response) => {
 
 const logout = async (req: Request, res: Response) => {
   req.session.destroy(() => {});
-  res.clearCookie('access-token').clearCookie('refresh-token').send('OK');
+  res.clearCookie('access-token').clearCookie('refresh-token').send(true);
 };
 
 export default {

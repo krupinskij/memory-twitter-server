@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 
+import HttpException, { BadRequestException, UnauthorizedException } from '../../exception';
 import { Request, Response } from '../../model';
 import userService from '../user/user.service';
 import { AddResultQuery, GetResultQuery, Result, UserResult, Users } from './result.model';
@@ -9,25 +10,38 @@ const addResult = async (req: Request<UserResult, AddResultQuery>, res: Response
   try {
     const { clicks, time } = req.body;
     const { level } = req.query;
-    const { me } = req.session;
-    const now = dayjs();
+    const mysql = req.mysql;
 
+    const me = await userService.me(req);
     if (!me) {
-      throw new Error('Nie jesteś zalogowany');
+      throw new UnauthorizedException('Nie jesteś zalogowany');
     }
 
-    await req.mysql?.execute(
-      `
+    if (!mysql) {
+      throw new BadRequestException('Wystąpił błąd spróbuj za parę minut');
+    }
+
+    const now = dayjs();
+    try {
+      await mysql.execute(
+        `
         INSERT INTO result_${level}(id, userId, time, clicks, createdAt) 
         VALUES(UUID_TO_BIN(UUID(), true), ?, ?, ?, ?)
-      `,
-      [me.id, time, clicks, now.unix()]
-    );
+        `,
+        [me.id, time, clicks, now.unix()]
+      );
+    } catch (err) {
+      throw new BadRequestException('Wystąpił błąd spróbuj za parę minut');
+    }
 
     res.send();
-  } catch (err) {
-    console.log(err);
-    res.status(400).send(err);
+  } catch (error: any) {
+    const { message, stack, authRetry } = error;
+    if (error instanceof HttpException) {
+      return res.status(error.httpStatus).send({ message, authRetry });
+    }
+
+    res.status(500).send({ message, stack });
   }
 };
 
@@ -37,7 +51,7 @@ const getResults = async (req: Request<any, GetResultQuery>, res: Response) => {
     const mysql = req.mysql;
 
     if (!mysql) {
-      throw new Error('Nie ma mysqla');
+      throw new BadRequestException('Wystąpił błąd spróbuj za parę minut');
     }
 
     const me = await userService.me(req);
@@ -75,9 +89,13 @@ const getResults = async (req: Request<any, GetResultQuery>, res: Response) => {
     });
 
     res.send(rankingResults);
-  } catch (err) {
-    console.log(err);
-    res.status(400).send(err);
+  } catch (error: any) {
+    const { message, stack, authRetry } = error;
+    if (error instanceof HttpException) {
+      return res.status(error.httpStatus).send({ message, authRetry });
+    }
+
+    res.status(500).send({ message, stack });
   }
 };
 
