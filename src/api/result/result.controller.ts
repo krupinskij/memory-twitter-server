@@ -36,9 +36,9 @@ const addResult = async (req: Request<UserResult, AddResultQuery>, res: Response
 
     res.send();
   } catch (error: any) {
-    const { message, stack, authRetry } = error;
+    const { message, stack, logout, verbose } = error;
     if (error instanceof HttpException) {
-      return res.status(error.httpStatus).send({ message, authRetry });
+      return res.status(error.httpStatus).send({ message, logout, verbose });
     }
 
     res.status(500).send({ message, stack });
@@ -90,9 +90,9 @@ const getResults = async (req: Request<any, GetResultQuery>, res: Response) => {
 
     res.send(rankingResults);
   } catch (error: any) {
-    const { message, stack, authRetry } = error;
+    const { message, stack, logout, verbose } = error;
     if (error instanceof HttpException) {
-      return res.status(error.httpStatus).send({ message, authRetry });
+      return res.status(error.httpStatus).send({ message, logout, verbose });
     }
 
     res.status(500).send({ message, stack });

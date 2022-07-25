@@ -11,7 +11,7 @@ const me = async (req: Request, res: Response) => {
   } catch (error: any) {
     const { message, stack } = error;
     if (error instanceof HttpException) {
-      return res.status(error.httpStatus).send({ message, authRetry: false });
+      return res.status(error.httpStatus).send({ message, logout: false, verbose: false });
     }
 
     res.status(500).send({ message, stack });
@@ -30,9 +30,9 @@ const getAvailableLevels = async (req: Request<any, QueryLevel>, res: Response) 
 
     res.send(availableLevels);
   } catch (error: any) {
-    const { message, stack, authRetry } = error;
+    const { message, stack, logout, verbose } = error;
     if (error instanceof HttpException) {
-      return res.status(error.httpStatus).send({ message, authRetry });
+      return res.status(error.httpStatus).send({ message, logout, verbose });
     }
 
     res.status(500).send({ message, stack });
@@ -62,9 +62,9 @@ const getFollowings = async (req: Request<any, QueryLevel>, res: Response) => {
 
     res.send(filteredFollowings);
   } catch (error: any) {
-    const { message, stack, authRetry } = error;
+    const { message, stack, logout, verbose } = error;
     if (error instanceof HttpException) {
-      return res.status(error.httpStatus).send({ message, authRetry });
+      return res.status(error.httpStatus).send({ message, logout, verbose });
     }
 
     res.status(500).send({ message, stack });
