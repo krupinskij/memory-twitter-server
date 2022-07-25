@@ -14,7 +14,12 @@ const me = async (req: Request, res: Response) => {
       return res.status(error.httpStatus).send({ message, logout: false, verbose: false });
     }
 
-    res.status(500).send({ message, stack });
+    res.status(500).send({
+      originMessage: message,
+      message: 'Coś się popsuło :/',
+      verbose: true,
+      stack,
+    });
   }
 };
 
@@ -35,7 +40,12 @@ const getAvailableLevels = async (req: Request<any, QueryLevel>, res: Response) 
       return res.status(error.httpStatus).send({ message, logout, verbose });
     }
 
-    res.status(500).send({ message, stack });
+    res.status(500).send({
+      originMessage: message,
+      message: 'Coś się popsuło :/',
+      verbose: true,
+      stack,
+    });
   }
 };
 
@@ -67,7 +77,12 @@ const getFollowings = async (req: Request<any, QueryLevel>, res: Response) => {
       return res.status(error.httpStatus).send({ message, logout, verbose });
     }
 
-    res.status(500).send({ message, stack });
+    res.status(500).send({
+      originMessage: message,
+      message: 'Coś się popsuło :/',
+      verbose: true,
+      stack,
+    });
   }
 };
 
