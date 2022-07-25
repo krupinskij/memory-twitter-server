@@ -50,7 +50,7 @@ const addResult = async (req: Request<UserResult, AddResultQuery>, res: Response
   }
 };
 
-const getResults = async (req: Request<any, GetResultQuery>, res: Response) => {
+const getResults = async (req: Request<any, GetResultQuery>, res: Response<Result[]>) => {
   try {
     const { users: who, lastItem: lastResultId } = req.query;
     const mysql = req.mysql;

@@ -1,10 +1,10 @@
 import HttpException, { BadRequestException } from '../../exception';
-import { MapLevel, Request, Response } from '../../model';
+import { MapLevel, Request, Response, User } from '../../model';
 import { getRandomIndexes, isValidLevel } from '../../utils';
 import { QueryLevel } from './user.model';
 import userService from './user.service';
 
-const me = async (req: Request, res: Response) => {
+const me = async (req: Request, res: Response<User>) => {
   try {
     const me = await userService.me(req);
     res.send(me);
@@ -16,14 +16,15 @@ const me = async (req: Request, res: Response) => {
 
     res.status(500).send({
       originMessage: message,
-      message: 'Coś się popsuło :/',
+      message: 'Coś się popsuło. Nastąpi wylogowanie :/',
+      logout: true,
       verbose: true,
       stack,
     });
   }
 };
 
-const getAvailableLevels = async (req: Request<any, QueryLevel>, res: Response) => {
+const getAvailableLevels = async (req: Request<any, QueryLevel>, res: Response<string[]>) => {
   try {
     const me = await userService.me(req);
     const followings = await userService.getFollowings(req, me.id, true);
@@ -49,7 +50,7 @@ const getAvailableLevels = async (req: Request<any, QueryLevel>, res: Response) 
   }
 };
 
-const getFollowings = async (req: Request<any, QueryLevel>, res: Response) => {
+const getFollowings = async (req: Request<any, QueryLevel>, res: Response<User[]>) => {
   try {
     const { level } = req.query;
 

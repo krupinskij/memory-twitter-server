@@ -4,7 +4,7 @@ import config from '../../config';
 import { Request, Response } from '../../model';
 import { mapUser } from '../../utils';
 
-const link = async (req: Request, res: Response) => {
+const link = async (req: Request, res: Response<{ url: string }>) => {
   const twitter = new TwitterApi({
     clientId: config.CLIENT_ID,
     clientSecret: config.CLIENT_SECRET,
@@ -28,7 +28,9 @@ const callback = async (req: Request, res: Response) => {
   const { codeVerifier } = req.session;
 
   if (!code || !state || !codeVerifier) {
-    return res.status(400).send('You denied the app or your session expired!');
+    return res
+      .status(400)
+      .send({ data: null, message: 'You denied the app or your session expired!' });
   }
 
   try {
@@ -57,11 +59,11 @@ const callback = async (req: Request, res: Response) => {
       })
       .redirect(config.REDIRECT);
   } catch (err) {
-    res.status(403).send('Invalid verifier or access tokens!');
+    res.status(403).send({ verbose: false, message: 'Invalid verifier or access tokens!' });
   }
 };
 
-const logout = async (req: Request, res: Response) => {
+const logout = async (req: Request, res: Response<true>) => {
   req.session.destroy(() => {});
   res.clearCookie('access-token').clearCookie('refresh-token').send(true);
 };
