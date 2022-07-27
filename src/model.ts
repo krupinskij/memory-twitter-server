@@ -11,13 +11,22 @@ export interface Request<ReqBody = any, ReqQuery = qs.ParsedQs, ReqParams = core
   mysql?: Connection;
 }
 
-export interface Response<ResBody = any>
-  extends ExpressResponse<ResBody | RequestError, Record<string, any>> {}
+export type ResponseBody<BodyType> =
+  | {
+      data: BodyType;
+      message: string;
+    }
+  | BodyType;
+
+export interface Response<BodyType = any>
+  extends ExpressResponse<ResponseBody<BodyType> | RequestError, Record<string, any>> {}
 
 export interface RequestError {
   message: string;
+  originMessage?: string;
+  verbose: boolean;
+  logout?: boolean;
   stack?: string;
-  authRetry?: boolean;
 }
 
 export type User = {

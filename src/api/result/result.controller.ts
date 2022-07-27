@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 
+import HttpException, { BadRequestException, UnauthorizedException } from '../../exception';
 import { Request, Response } from '../../model';
 import userService from '../user/user.service';
 import { AddResultQuery, GetResultQuery, Result, UserResult, Users } from './result.model';
@@ -9,35 +10,55 @@ const addResult = async (req: Request<UserResult, AddResultQuery>, res: Response
   try {
     const { clicks, time } = req.body;
     const { level } = req.query;
-    const { me } = req.session;
-    const now = dayjs();
+    const mysql = req.mysql;
+    const t = req.t;
 
+    const me = await userService.me(req);
     if (!me) {
-      throw new Error('Nie jesteś zalogowany');
+      throw new UnauthorizedException(t('errors:not-logged'));
     }
 
-    await req.mysql?.execute(
-      `
+    if (!mysql) {
+      throw new BadRequestException(t('errors:error-occured'));
+    }
+
+    const now = dayjs();
+    try {
+      await mysql.execute(
+        `
         INSERT INTO result_${level}(id, userId, time, clicks, createdAt) 
         VALUES(UUID_TO_BIN(UUID(), true), ?, ?, ?, ?)
-      `,
-      [me.id, time, clicks, now.unix()]
-    );
+        `,
+        [me.id, time, clicks, now.unix()]
+      );
+    } catch (err) {
+      throw new BadRequestException(t('errors:error-occured'));
+    }
 
     res.send();
-  } catch (err) {
-    console.log(err);
-    res.status(400).send(err);
+  } catch (error: any) {
+    const { message, stack, logout, verbose } = error;
+    if (error instanceof HttpException) {
+      return res.status(error.httpStatus).send({ message, logout, verbose });
+    }
+
+    res.status(500).send({
+      originMessage: message,
+      message: req.t('errors:something-happened'),
+      verbose: true,
+      stack,
+    });
   }
 };
 
-const getResults = async (req: Request<any, GetResultQuery>, res: Response) => {
+const getResults = async (req: Request<any, GetResultQuery>, res: Response<Result[]>) => {
   try {
     const { users: who, lastItem: lastResultId } = req.query;
     const mysql = req.mysql;
+    const t = req.t;
 
     if (!mysql) {
-      throw new Error('Nie ma mysqla');
+      throw new BadRequestException(t('errors:error-occured'));
     }
 
     const me = await userService.me(req);
@@ -75,9 +96,18 @@ const getResults = async (req: Request<any, GetResultQuery>, res: Response) => {
     });
 
     res.send(rankingResults);
-  } catch (err) {
-    console.log(err);
-    res.status(400).send(err);
+  } catch (error: any) {
+    const { message, stack, logout, verbose } = error;
+    if (error instanceof HttpException) {
+      return res.status(error.httpStatus).send({ message, logout, verbose });
+    }
+
+    res.status(500).send({
+      originMessage: message,
+      message: req.t('errors:something-happened'),
+      verbose: true,
+      stack,
+    });
   }
 };
 

@@ -3,6 +3,9 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
 import session from 'express-session';
+import i18next from 'i18next';
+import Backend from 'i18next-fs-backend';
+import middleware from 'i18next-http-middleware';
 import { createConnection } from 'mysql2/promise';
 import { createClient, RedisClientType } from 'redis';
 
@@ -37,6 +40,22 @@ const redisClient: RedisClientType = createClient({
 });
 redisClient.connect();
 
+i18next
+  .use(Backend)
+  .use(middleware.LanguageDetector)
+  .init({
+    fallbackLng: 'en',
+    load: 'languageOnly',
+    ns: ['errors'],
+    backend: {
+      loadPath: './src/translations/{{lng}}/{{ns}}.json',
+      crossDomain: true,
+    },
+    detection: {
+      order: ['header'],
+    },
+  });
+
 const app = express();
 
 app.use(json());
@@ -59,6 +78,7 @@ app.use(
 
 app.use(mysql(connectionPromise));
 app.use(redis(redisClient));
+app.use(middleware.handle(i18next));
 
 app.use('/api/auth', auth);
 

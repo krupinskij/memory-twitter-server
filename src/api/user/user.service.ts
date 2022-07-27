@@ -1,16 +1,19 @@
+import { UnauthorizedException } from '../../exception';
 import { Request, User } from '../../model';
 import { mapUser } from '../../utils';
 
 const me = async (req: Request): Promise<User> => {
   const twitter = req.twitter;
+  const t = req.t;
+
   const { me: sessionMe } = req.session;
+
+  if (!twitter) {
+    throw new UnauthorizedException(t('errors:not-logged'));
+  }
 
   if (sessionMe) {
     return sessionMe;
-  }
-
-  if (!twitter) {
-    throw new Error('Nie ma twittera');
   }
 
   const { data: twitterMe } = await twitter.v2.me({
@@ -26,9 +29,10 @@ const me = async (req: Request): Promise<User> => {
 const getFollowings = async (req: Request, id: string, filtered: boolean): Promise<User[]> => {
   const twitter = req.twitter;
   const redis = req.redis;
+  const t = req.t;
 
   if (!twitter) {
-    throw new Error('Nie ma twittera');
+    throw new UnauthorizedException(t('errors:not-logged'));
   }
 
   const cachedFollowingsIds = (await redis?.json.get(`${id}#followings`)) as string[] | null;

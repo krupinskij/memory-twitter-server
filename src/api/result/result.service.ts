@@ -1,31 +1,38 @@
+import { BadRequestException } from '../../exception';
 import { Request } from '../../model';
 import { Order, ResultDB } from './result.model';
 
 const findResultById = async (req: Request, resultId: string): Promise<ResultDB> => {
   const { level } = req.query;
   const mysql = req.mysql;
+  const t = req.t;
 
   if (!mysql) {
-    throw new Error('Nie ma mysqla');
+    throw new BadRequestException(t('errors:error-occured'));
   }
 
-  const [results] = await mysql.execute<ResultDB[]>(
-    `
+  try {
+    const [results] = await mysql.execute<ResultDB[]>(
+      `
       SELECT BIN_TO_UUID(id) as id, userId, clicks, time, createdAt 
       FROM result_${level} 
       WHERE BIN_TO_UUID(id) = "${resultId}"
     `
-  );
+    );
 
-  return results[0];
+    return results[0];
+  } catch (err) {
+    throw new BadRequestException(t('errors:error-occured'));
+  }
 };
 
 const findResultsByIds = async (req: Request, userIds: string[]): Promise<ResultDB[]> => {
   const { level, order } = req.query;
   const mysql = req.mysql;
+  const t = req.t;
 
   if (!mysql) {
-    throw new Error('Nie ma mysqla');
+    throw new BadRequestException(t('errors:error-occured'));
   }
 
   let orderStatement = '';
@@ -38,17 +45,21 @@ const findResultsByIds = async (req: Request, userIds: string[]): Promise<Result
       break;
   }
 
-  const [results] = await mysql.execute<ResultDB[]>(
-    `
+  try {
+    const [results] = await mysql.execute<ResultDB[]>(
+      `
       SELECT BIN_TO_UUID(id) as id, userId, clicks, time, createdAt 
       FROM result_${level} 
       WHERE userId IN (${userIds.join(',')})
       ${orderStatement}
       LIMIT 20;
-    `
-  );
+      `
+    );
 
-  return results;
+    return results;
+  } catch (err) {
+    throw new BadRequestException(t('errors:error-occured'));
+  }
 };
 
 const findResultsByIdsAfterResult = async (
@@ -58,9 +69,10 @@ const findResultsByIdsAfterResult = async (
 ): Promise<ResultDB[]> => {
   const { level, order } = req.query;
   const mysql = req.mysql;
+  const t = req.t;
 
   if (!mysql) {
-    throw new Error('Nie ma mysqla');
+    throw new BadRequestException(t('errors:error-occured'));
   }
 
   let orderStatement = '';
@@ -87,17 +99,21 @@ const findResultsByIdsAfterResult = async (
       break;
   }
 
-  const [results] = await mysql.execute<ResultDB[]>(
-    `
+  try {
+    const [results] = await mysql.execute<ResultDB[]>(
+      `
       SELECT BIN_TO_UUID(id) as id, userId, clicks, time, createdAt 
       FROM result_${level} 
       WHERE userId IN (${userIds.join(',')})
       ${orderStatement}
       LIMIT 20;
     `
-  );
+    );
 
-  return results;
+    return results;
+  } catch (err) {
+    throw new BadRequestException(t('errors:error-occured'));
+  }
 };
 
 export default {
