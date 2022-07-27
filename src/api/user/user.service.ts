@@ -4,10 +4,12 @@ import { mapUser } from '../../utils';
 
 const me = async (req: Request): Promise<User> => {
   const twitter = req.twitter;
+  const t = req.t;
+
   const { me: sessionMe } = req.session;
 
   if (!twitter) {
-    throw new UnauthorizedException('Nie jesteś zalogowany');
+    throw new UnauthorizedException(t('errors:not-logged'));
   }
 
   if (sessionMe) {
@@ -27,9 +29,10 @@ const me = async (req: Request): Promise<User> => {
 const getFollowings = async (req: Request, id: string, filtered: boolean): Promise<User[]> => {
   const twitter = req.twitter;
   const redis = req.redis;
+  const t = req.t;
 
   if (!twitter) {
-    throw new UnauthorizedException('Nie jesteś zalogowany');
+    throw new UnauthorizedException(t('errors:not-logged'));
   }
 
   const cachedFollowingsIds = (await redis?.json.get(`${id}#followings`)) as string[] | null;

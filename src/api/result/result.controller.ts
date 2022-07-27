@@ -11,14 +11,15 @@ const addResult = async (req: Request<UserResult, AddResultQuery>, res: Response
     const { clicks, time } = req.body;
     const { level } = req.query;
     const mysql = req.mysql;
+    const t = req.t;
 
     const me = await userService.me(req);
     if (!me) {
-      throw new UnauthorizedException('Nie jesteś zalogowany');
+      throw new UnauthorizedException(t('errors:not-logged'));
     }
 
     if (!mysql) {
-      throw new BadRequestException('Wystąpił błąd spróbuj za parę minut');
+      throw new BadRequestException(t('errors:error-occured'));
     }
 
     const now = dayjs();
@@ -31,7 +32,7 @@ const addResult = async (req: Request<UserResult, AddResultQuery>, res: Response
         [me.id, time, clicks, now.unix()]
       );
     } catch (err) {
-      throw new BadRequestException('Wystąpił błąd spróbuj za parę minut');
+      throw new BadRequestException(t('errors:error-occured'));
     }
 
     res.send();
@@ -43,7 +44,7 @@ const addResult = async (req: Request<UserResult, AddResultQuery>, res: Response
 
     res.status(500).send({
       originMessage: message,
-      message: 'Coś się popsuło :/',
+      message: req.t('errors:something-happened'),
       verbose: true,
       stack,
     });
@@ -54,9 +55,10 @@ const getResults = async (req: Request<any, GetResultQuery>, res: Response<Resul
   try {
     const { users: who, lastItem: lastResultId } = req.query;
     const mysql = req.mysql;
+    const t = req.t;
 
     if (!mysql) {
-      throw new BadRequestException('Wystąpił błąd spróbuj za parę minut');
+      throw new BadRequestException(t('errors:error-occured'));
     }
 
     const me = await userService.me(req);
@@ -102,7 +104,7 @@ const getResults = async (req: Request<any, GetResultQuery>, res: Response<Resul
 
     res.status(500).send({
       originMessage: message,
-      message: 'Coś się popsuło :/',
+      message: req.t('errors:something-happened'),
       verbose: true,
       stack,
     });

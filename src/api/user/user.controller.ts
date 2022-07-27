@@ -16,7 +16,7 @@ const me = async (req: Request, res: Response<User>) => {
 
     res.status(500).send({
       originMessage: message,
-      message: 'Coś się popsuło. Nastąpi wylogowanie :/',
+      message: req.t('errors:something-happened'),
       logout: true,
       verbose: true,
       stack,
@@ -43,7 +43,7 @@ const getAvailableLevels = async (req: Request<any, QueryLevel>, res: Response<s
 
     res.status(500).send({
       originMessage: message,
-      message: 'Coś się popsuło :/',
+      message: req.t('errors:something-happened'),
       verbose: true,
       stack,
     });
@@ -53,9 +53,10 @@ const getAvailableLevels = async (req: Request<any, QueryLevel>, res: Response<s
 const getFollowings = async (req: Request<any, QueryLevel>, res: Response<User[]>) => {
   try {
     const { level } = req.query;
+    const t = req.t;
 
     if (!isValidLevel(level)) {
-      throw new BadRequestException('Nie ma takiego poziomu');
+      throw new BadRequestException(t('errros:no-level'));
     }
 
     const followingsToRead = MapLevel[level];
@@ -65,7 +66,7 @@ const getFollowings = async (req: Request<any, QueryLevel>, res: Response<User[]
     const followingsLength = followings.length;
 
     if (followingsLength < followingsToRead) {
-      throw new BadRequestException('Nie masz wystarczającej liczby obserwowanych');
+      throw new BadRequestException(t('errros:no-followings'));
     }
 
     const randomIndexes = getRandomIndexes(followingsToRead, followingsLength);
@@ -80,7 +81,7 @@ const getFollowings = async (req: Request<any, QueryLevel>, res: Response<User[]
 
     res.status(500).send({
       originMessage: message,
-      message: 'Coś się popsuło :/',
+      message: req.t('errors:something-happened'),
       verbose: true,
       stack,
     });
