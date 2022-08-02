@@ -12,12 +12,12 @@ import userService from '../user/user.service';
 import { TextInfo } from './tweet.model';
 
 export const createImage = async (req: Request): Promise<Bitmap> => {
+  const t = req.t;
   if (!req.canvas) {
-    throw new BadRequestException('Nie możesz wysłać tweeta');
+    throw new BadRequestException(t('errors:not-tweet'));
   }
 
   const { context, image } = req.canvas;
-  const t = req.t;
 
   const me = await userService.me(req);
   if (!me) {
@@ -40,35 +40,10 @@ export const createImage = async (req: Request): Promise<Bitmap> => {
     }
   }
 
-  writeText([{ bold: true, text: "I've finished the game" }], 75, 730, context);
-  writeText(
-    [
-      { bold: false, text: 'on' },
-      { bold: true, text: 'easy' },
-      { bold: false, text: 'level.' },
-    ],
-    50,
-    860,
-    context
-  );
-  writeText(
-    [
-      { bold: false, text: "I've made" },
-      { bold: true, text: Math.random() + ' clicks' },
-    ],
-    50,
-    960,
-    context
-  );
-  writeText(
-    [
-      { bold: false, text: 'in' },
-      { bold: true, text: '01:43:234.' },
-    ],
-    50,
-    1040,
-    context
-  );
+  writeText(t('tweet:game-finished', { returnObjects: true }), 75, 730, context);
+  writeText(t('tweet:level', { context: 'easy', returnObjects: true }), 50, 860, context);
+  writeText(t('tweet:clicks', { count: 10, clicks: 10, returnObjects: true }), 50, 960, context);
+  writeText(t('tweet:time', { time: '01:10:32', returnObjects: true }), 50, 1040, context);
 
   return image;
 };

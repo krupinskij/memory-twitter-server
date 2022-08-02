@@ -48,7 +48,7 @@ i18next
   .init({
     fallbackLng: 'en',
     load: 'languageOnly',
-    ns: ['errors'],
+    ns: ['errors', 'tweet'],
     backend: {
       loadPath: './src/translations/{{lng}}/{{ns}}.json',
       crossDomain: true,
