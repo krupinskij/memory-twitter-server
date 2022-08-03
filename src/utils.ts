@@ -9,8 +9,13 @@ export const mapUser = (user: UserV2): User => ({
   pp: decodeProfilePicture(user.profile_image_url),
 });
 
-export const decodeProfilePicture = (pp: string | undefined) =>
-  pp?.replace('https://pbs.twimg.com/profile_images/', '').replace('_normal', '$');
+export const decodeProfilePicture = (pp: string | undefined) => {
+  if (pp?.match('default_profile_images')) {
+    return undefined;
+  }
+
+  return pp?.replace('https://pbs.twimg.com/profile_images/', '').replace('_normal', '$');
+};
 
 export const encodeProfilePicture = (
   pp: string | undefined,
