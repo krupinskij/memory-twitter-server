@@ -1,13 +1,26 @@
 import fs from 'fs';
 import * as PImage from 'pureimage';
 
-import HttpException from '../../exception';
+import HttpException, { ForbiddenException } from '../../exception';
 import { Request, Response } from '../../model';
+import resultService from '../result/result.service';
+import userService from '../user/user.service';
 import tweetService from './tweet.service';
 
-const sendTweet = async (req: Request, res: Response) => {
+const sendTweet = async (req: Request<any, any, { tweetId: string }>, res: Response) => {
   try {
-    const image = await tweetService.createImage(req);
+    const { tweetId } = req.params;
+    const t = req.t;
+
+    const me = await userService.me(req);
+
+    const result = await resultService.findResultById(req, tweetId);
+
+    if (result.userId !== me.id) {
+      throw new ForbiddenException(t('errors:not-your-result'));
+    }
+
+    const image = await tweetService.createImage(req, result);
     await PImage.encodePNGToStream(image, fs.createWriteStream('result.png'));
 
     res.send();

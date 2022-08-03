@@ -4,6 +4,6 @@ import tweetController from './tweet.controller';
 
 const router = Router();
 
-router.post('/', tweetController.sendTweet);
+router.post('/:tweetId', tweetController.sendTweet);
 
 export default router;

@@ -8,10 +8,11 @@ import { Context } from 'pureimage/types/context';
 import { BadRequestException, UnauthorizedException } from '../../exception';
 import { Request } from '../../model';
 import { encodeProfilePicture } from '../../utils';
+import { ResultDB } from '../result/result.model';
 import userService from '../user/user.service';
 import { TextInfo } from './tweet.model';
 
-export const createImage = async (req: Request): Promise<Bitmap> => {
+export const createImage = async (req: Request, result: ResultDB): Promise<Bitmap> => {
   const t = req.t;
   if (!req.canvas) {
     throw new BadRequestException(t('errors:not-tweet'));
@@ -41,9 +42,14 @@ export const createImage = async (req: Request): Promise<Bitmap> => {
   }
 
   writeText(t('tweet:game-finished', { returnObjects: true }), 75, 730, context);
-  writeText(t('tweet:level', { context: 'easy', returnObjects: true }), 50, 860, context);
-  writeText(t('tweet:clicks', { count: 10, clicks: 10, returnObjects: true }), 50, 960, context);
-  writeText(t('tweet:time', { time: '01:10:32', returnObjects: true }), 50, 1040, context);
+  writeText(t('tweet:level', { context: result.level, returnObjects: true }), 50, 860, context);
+  writeText(
+    t('tweet:clicks', { count: result.clicks, clicks: result.clicks, returnObjects: true }),
+    50,
+    960,
+    context
+  );
+  writeText(t('tweet:time', { time: result.time, returnObjects: true }), 50, 1040, context);
 
   return image;
 };

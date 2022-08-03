@@ -1,8 +1,12 @@
 import { BadRequestException } from '../../exception';
 import { Request } from '../../model';
+import { QueryLevel } from '../user/user.model';
 import { Order, ResultDB } from './result.model';
 
-const findResultById = async (req: Request, resultId: string): Promise<ResultDB> => {
+const findResultById = async (
+  req: Request<any, QueryLevel>,
+  resultId: string
+): Promise<ResultDB> => {
   const { level } = req.query;
   const mysql = req.mysql;
   const t = req.t;
@@ -14,7 +18,7 @@ const findResultById = async (req: Request, resultId: string): Promise<ResultDB>
   try {
     const [results] = await mysql.execute<ResultDB[]>(
       `
-      SELECT BIN_TO_UUID(id) as id, userId, clicks, time, createdAt 
+      SELECT BIN_TO_UUID(id) as id, userId, clicks, time, level, createdAt 
       FROM result_${level} 
       WHERE BIN_TO_UUID(id) = "${resultId}"
     `

@@ -3,7 +3,15 @@ import dayjs from 'dayjs';
 import HttpException, { BadRequestException, UnauthorizedException } from '../../exception';
 import { Request, Response } from '../../model';
 import userService from '../user/user.service';
-import { AddResultQuery, GetResultQuery, Result, UserResult, Users } from './result.model';
+import {
+  AddResultQuery,
+  GetResultQuery,
+  IDDB,
+  Result,
+  ResultDB,
+  UserResult,
+  Users,
+} from './result.model';
 import resultService from './result.service';
 
 const addResult = async (req: Request<UserResult, AddResultQuery>, res: Response) => {
@@ -23,19 +31,26 @@ const addResult = async (req: Request<UserResult, AddResultQuery>, res: Response
     }
 
     const now = dayjs();
+    let lastId: string | undefined;
     try {
+      await mysql.beginTransaction();
+      await mysql.execute('SET @id := UUID_TO_BIN(UUID(), true);');
       await mysql.execute(
         `
-        INSERT INTO result_${level}(id, userId, time, clicks, createdAt) 
-        VALUES(UUID_TO_BIN(UUID(), true), ?, ?, ?, ?)
+        INSERT INTO result_${level}(id, userId, time, clicks, level, createdAt) 
+        VALUES(@id, ?, ?, ?, ?, ?)
         `,
-        [me.id, time, clicks, now.unix()]
+        [me.id, time, clicks, level, now.unix()]
       );
+      const [data] = await mysql.execute<IDDB[]>('SELECT BIN_TO_UUID(@id) as id;');
+      await mysql.commit();
+      lastId = data[0]?.id;
     } catch (err) {
+      await mysql.rollback();
       throw new BadRequestException(t('errors:error-occured'));
     }
 
-    res.send();
+    res.send({ id: lastId });
   } catch (error: any) {
     const { message, stack, logout, verbose } = error;
     if (error instanceof HttpException) {

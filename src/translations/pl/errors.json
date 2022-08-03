@@ -4,5 +4,6 @@
   "no-level": "Nie ma takiego poziomu.",
   "no-followings": "Nie masz wystarczającej liczby obserwowanych.",
   "error-occured": "Wystąpił błąd. Spróbuj za parę minut.",
-  "not-tweet": "Wystąpił błąd. Nie można wysłać tweeta teraz."
+  "not-tweet": "Wystąpił błąd. Nie można wysłać tweeta teraz.",
+  "not-your-result": "To nie jest twój wynik."
 }

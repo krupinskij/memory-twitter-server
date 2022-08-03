@@ -34,9 +34,14 @@ export type ResultDB = RowDataPacket & {
   userId: string;
   clicks: number;
   time: number;
+  level: string;
   createdAt: number;
 };
 
 export type Result = Omit<ResultDB, 'userId'> & {
   user: User;
+};
+
+export type IDDB = RowDataPacket & {
+  id: string;
 };
