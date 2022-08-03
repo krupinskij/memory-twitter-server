@@ -35,8 +35,8 @@ const getFollowings = async (req: Request, id: string, filtered: boolean): Promi
     throw new UnauthorizedException(t('errors:not-logged'));
   }
 
-  const cachedFollowingsIds = (await redis?.json.get(`${id}#followings`)) as string[] | null;
-  if (cachedFollowingsIds) {
+  const cachedFollowingsIds = (await redis?.json.get(`${id}#followings`)) as string[];
+  if (cachedFollowingsIds?.length > 0) {
     const cachedFollowings = (await redis?.json.mGet(cachedFollowingsIds, '$')) as User[];
     const mappedFollowings = cachedFollowings.flatMap((following) => following);
 
@@ -47,7 +47,7 @@ const getFollowings = async (req: Request, id: string, filtered: boolean): Promi
     return mappedFollowings;
   }
 
-  const { data: twitterFollowings } = await twitter.v2.following(id, {
+  const { data: twitterFollowings = [] } = await twitter.v2.following(id, {
     'user.fields': ['name', 'profile_image_url'],
   });
 

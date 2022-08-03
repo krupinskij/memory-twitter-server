@@ -11,6 +11,11 @@ const sendTweet = async (req: Request<any, any, { tweetId: string }>, res: Respo
   try {
     const { tweetId } = req.params;
     const t = req.t;
+    const twitter = req.twitter;
+
+    if (!twitter) {
+      throw new Error('no');
+    }
 
     const me = await userService.me(req);
 
@@ -21,8 +26,14 @@ const sendTweet = async (req: Request<any, any, { tweetId: string }>, res: Respo
     }
 
     const image = await tweetService.createImage(req, result);
-    await PImage.encodePNGToStream(image, fs.createWriteStream('result.png'));
+    // await PImage.encodePNGToStream(image, fs.createWriteStream('result.png'));
 
+    try {
+      const mediaId = await twitter.v1.uploadMedia(Buffer.from(image.data), { mimeType: 'png' });
+    } catch (err) {
+      console.log(err);
+    }
+    // await twitter.v2.tweet('dupa test test', { media: { media_ids: [mediaId] } });
     res.send();
   } catch (error: any) {
     const { message, stack, logout, verbose } = error;
