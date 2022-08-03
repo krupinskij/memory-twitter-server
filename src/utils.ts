@@ -23,6 +23,16 @@ export const encodeProfilePicture = (
   return `https://abs.twimg.com/sticky/default_profile_images/default_profile${format}.png`;
 };
 
+export const formatTime = (time: number) => {
+  const ms = time;
+  const s = Math.floor(ms / 1000);
+  const m = Math.floor(s / 60);
+
+  return `${String(m).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}:${String(
+    ms % 1000
+  ).padStart(3, '0')}`;
+};
+
 export const getRandomIndexes = (count: number, maxIndex: number): number[] => {
   if (count >= maxIndex) {
     return new Array(maxIndex).fill(0).map((_, index) => index);

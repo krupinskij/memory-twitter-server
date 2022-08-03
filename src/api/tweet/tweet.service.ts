@@ -7,7 +7,7 @@ import { Context } from 'pureimage/types/context';
 
 import { BadRequestException, UnauthorizedException } from '../../exception';
 import { Request } from '../../model';
-import { encodeProfilePicture } from '../../utils';
+import { encodeProfilePicture, formatTime } from '../../utils';
 import { ResultDB } from '../result/result.model';
 import userService from '../user/user.service';
 import { TextInfo } from './tweet.model';
@@ -49,7 +49,12 @@ export const createImage = async (req: Request, result: ResultDB): Promise<Bitma
     960,
     context
   );
-  writeText(t('tweet:time', { time: result.time, returnObjects: true }), 50, 1040, context);
+  writeText(
+    t('tweet:time', { time: formatTime(result.time), returnObjects: true }),
+    50,
+    1040,
+    context
+  );
 
   return image;
 };
