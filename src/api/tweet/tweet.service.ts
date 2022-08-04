@@ -1,9 +1,10 @@
-import fs from 'fs';
 import * as client from 'https';
 import path from 'path';
 import * as PImage from 'pureimage';
 import { Bitmap } from 'pureimage/types/bitmap';
 import { Context } from 'pureimage/types/context';
+import { PassThrough } from 'stream';
+import { EUploadMimeType, TweetV1 } from 'twitter-api-v2';
 
 import { BadRequestException, UnauthorizedException } from '../../exception';
 import { Request } from '../../model';
@@ -83,4 +84,30 @@ const writeText = (textInfo: TextInfo[], fontSize: number, height: number, conte
   });
 };
 
-export default { createImage };
+const sendTweet = async (req: Request, image: Bitmap): Promise<TweetV1> => {
+  const twitter = req.twitter;
+  const t = req.t;
+
+  if (!twitter) {
+    throw new UnauthorizedException(t('errors:not-logged'));
+  }
+
+  const buffer = await encodeBitmapIntoBuffer(image);
+  const mediaId = await twitter.v1.uploadMedia(buffer, { mimeType: EUploadMimeType.Png });
+  const tweet = await twitter.v1.tweet('Some text memory-twitter.com', { media_ids: [mediaId] });
+
+  return tweet;
+};
+
+const encodeBitmapIntoBuffer = async (canvas: Bitmap) => {
+  const passThroughStream = new PassThrough();
+  const pngData: any[] = [];
+
+  passThroughStream.on('data', (chunk) => pngData.push(chunk));
+  passThroughStream.on('end', () => {});
+
+  await PImage.encodePNGToStream(canvas, passThroughStream);
+
+  return Buffer.concat(pngData);
+};
+export default { createImage, sendTweet };

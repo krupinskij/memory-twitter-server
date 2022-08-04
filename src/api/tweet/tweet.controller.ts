@@ -1,4 +1,4 @@
-import HttpException, { ForbiddenException } from '../../exception';
+import HttpException, { ForbiddenException, UnauthorizedException } from '../../exception';
 import { Request, Response } from '../../model';
 import resultService from '../result/result.service';
 import userService from '../user/user.service';
@@ -11,7 +11,7 @@ const sendTweet = async (req: Request<any, any, { tweetId: string }>, res: Respo
     const twitter = req.twitter;
 
     if (!twitter) {
-      throw new Error('no');
+      throw new UnauthorizedException(t('errors:not-logged'));
     }
 
     const me = await userService.me(req);
@@ -23,6 +23,7 @@ const sendTweet = async (req: Request<any, any, { tweetId: string }>, res: Respo
     }
 
     const image = await tweetService.createImage(req, result);
+    await tweetService.sendTweet(req, image);
 
     res.send();
   } catch (error: any) {
