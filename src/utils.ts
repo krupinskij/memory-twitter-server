@@ -1,8 +1,15 @@
-import { UserV2 } from 'twitter-api-v2';
+import { UserV1, UserV2 } from 'twitter-api-v2';
 
 import { Level, User } from './model';
 
-export const mapUser = (user: UserV2): User => ({
+export const mapUserV1 = (user: UserV1): User => ({
+  id: user.id_str,
+  nm: user.name,
+  un: user.screen_name,
+  pp: decodeProfilePicture(user.profile_image_url_https),
+});
+
+export const mapUserV2 = (user: UserV2): User => ({
   id: user.id,
   nm: user.name,
   un: user.username,

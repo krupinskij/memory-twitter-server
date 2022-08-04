@@ -22,7 +22,8 @@ import { User } from './model';
 
 declare module 'express-session' {
   interface SessionData {
-    codeVerifier?: string;
+    oauthToken?: string;
+    oauthTokenSecret?: string;
     me?: User;
   }
 }

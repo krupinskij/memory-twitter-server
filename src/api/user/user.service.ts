@@ -1,6 +1,6 @@
 import { UnauthorizedException } from '../../exception';
 import { Request, User } from '../../model';
-import { mapUser } from '../../utils';
+import { mapUserV1, mapUserV2 } from '../../utils';
 
 const me = async (req: Request): Promise<User> => {
   const twitter = req.twitter;
@@ -16,11 +16,9 @@ const me = async (req: Request): Promise<User> => {
     return sessionMe;
   }
 
-  const { data: twitterMe } = await twitter.v2.me({
-    'user.fields': ['name', 'profile_image_url'],
-  });
+  const twitterMe = await twitter.currentUser();
 
-  const me = mapUser(twitterMe);
+  const me = mapUserV1(twitterMe);
   req.session.me = me;
 
   return me;
@@ -54,14 +52,14 @@ const getFollowings = async (req: Request, id: string, filtered: boolean): Promi
   // filter out followings without images
   const filteredFollowings = twitterFollowings
     .filter((following) => !!following.profile_image_url)
-    .map((following) => mapUser(following));
+    .map((following) => mapUserV2(following));
 
   const followingsIds = filteredFollowings.map((following) => following.id);
 
   await redis?.json.set(`${id}#followings`, '$', followingsIds);
   await redis?.expire(`${id}#followings`, 300);
 
-  const followingsToCache = twitterFollowings.map(mapUser);
+  const followingsToCache = twitterFollowings.map(mapUserV2);
   for (let i = 0; i < followingsToCache.length; i++) {
     const following = followingsToCache[i];
     await redis?.json.set(following.id, '$', following);
