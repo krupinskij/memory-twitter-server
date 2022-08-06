@@ -1,5 +1,6 @@
 {
-  "game-finished": [{ "bold": true, "text": "Ukończyłæm grę" }],
+  "status": "Zagraj ze mną: memorytwitter.com",
+  "game-finished": [{ "bold": true, "text": "Ukończyłam/em grę" }],
   "level_easy": [
     { "bold": false, "text": "na poziomie" },
     { "bold": true, "text": "łatwym." }
@@ -17,15 +18,15 @@
     { "bold": true, "text": "legendarnym." }
   ],
   "clicks_one": [
-    { "bold": false, "text": "Wykonałæm" },
+    { "bold": false, "text": "Wykonałam/em" },
     { "bold": true, "text": "{{ clicks }} kliknięcie" }
   ],
   "clicks_few": [
-    { "bold": false, "text": "Wykonałæm" },
+    { "bold": false, "text": "Wykonałam/em" },
     { "bold": true, "text": "{{ clicks }} kliknięcia" }
   ],
   "clicks_many": [
-    { "bold": false, "text": "Wykonałæm" },
+    { "bold": false, "text": "Wykonałam/em" },
     { "bold": true, "text": "{{ clicks }} kliknięć" }
   ],
   "time": [

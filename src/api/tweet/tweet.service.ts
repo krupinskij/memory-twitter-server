@@ -94,7 +94,7 @@ const sendTweet = async (req: Request, image: Bitmap): Promise<TweetV1> => {
 
   const buffer = await encodeBitmapIntoBuffer(image);
   const mediaId = await twitter.v1.uploadMedia(buffer, { mimeType: EUploadMimeType.Png });
-  const tweet = await twitter.v1.tweet('Some text memory-twitter.com', { media_ids: [mediaId] });
+  const tweet = await twitter.v1.tweet(t('tweet:status'), { media_ids: [mediaId] });
 
   return tweet;
 };

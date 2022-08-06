@@ -1,4 +1,5 @@
 {
+  "status": "Play with me: memorytwitter.com",
   "game-finished": [{ "bold": true, "text": "I've finished the game" }],
   "level": [
     { "bold": false, "text": "on" },
