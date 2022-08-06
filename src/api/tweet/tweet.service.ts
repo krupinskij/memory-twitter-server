@@ -42,23 +42,23 @@ export const createImage = async (req: Request, result: ResultDB): Promise<Bitma
     }
   }
 
-  writeText(t('tweet:game-finished', { returnObjects: true }), 75, 730, context);
+  writeText(t('tweet:game-finished', { returnObjects: true }), 75, 720, context);
   writeText(
     t('tweet:level', { context: result.level, level: result.level, returnObjects: true }),
     50,
-    860,
+    825,
     context
   );
   writeText(
     t('tweet:clicks', { count: result.clicks, clicks: result.clicks, returnObjects: true }),
     50,
-    960,
+    910,
     context
   );
   writeText(
     t('tweet:time', { time: formatTime(result.time), returnObjects: true }),
     50,
-    1040,
+    995,
     context
   );
 

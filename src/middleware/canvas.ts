@@ -13,7 +13,7 @@ const canvas = async (req: Request, res: Response, next: NextFunction) => {
   PImage.registerFont(fontBold, 'ChirpBold', 700, 'normal', 'normal').loadSync();
   PImage.registerFont(fontRegular, 'Chirp', 500, 'normal', 'normal').loadSync();
 
-  const image = PImage.make(1000, 1400, {});
+  const image = PImage.make(1000, 1300, {});
   const context = image.getContext('2d');
 
   context.fillStyle = '#000';
