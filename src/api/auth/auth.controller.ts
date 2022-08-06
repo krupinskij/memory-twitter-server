@@ -45,18 +45,9 @@ const callback = async (req: Request<null, { oauth_verifier: string }>, res: Res
     }
 
     req.session.me = mapUserV1(twitterMe);
-    res
-      .cookie('access-token', accessToken, {
-        maxAge: 60 * 60 * 1000,
-        httpOnly: true,
-        secure: true,
-      })
-      .cookie('access-secret', accessSecret, {
-        maxAge: 60 * 60 * 1000,
-        httpOnly: true,
-        secure: true,
-      })
-      .redirect(config.REDIRECT);
+    req.session.accessToken = accessToken;
+    req.session.accessSecret = accessSecret;
+    res.redirect(config.REDIRECT);
   } catch (err) {
     res.status(403).send({ verbose: false, message: 'Invalid verifier or access tokens!' });
   }
@@ -64,7 +55,7 @@ const callback = async (req: Request<null, { oauth_verifier: string }>, res: Res
 
 const logout = async (req: Request, res: Response<true>) => {
   req.session.destroy(() => {});
-  res.clearCookie('access-token').clearCookie('access-secret').send(true);
+  res.send(true);
 };
 
 export default {

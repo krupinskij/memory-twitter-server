@@ -5,8 +5,7 @@ import config from '../config';
 import { Request } from '../model';
 
 const twitter = async (req: Request, res: Response, next: NextFunction) => {
-  const accessToken = req.cookies['access-token'];
-  const accessSecret = req.cookies['access-secret'];
+  const { accessToken, accessSecret } = req.session;
 
   if (!accessToken || !accessSecret) {
     delete req.twitter;

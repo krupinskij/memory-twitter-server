@@ -25,6 +25,8 @@ declare module 'express-session' {
   interface SessionData {
     oauthToken?: string;
     oauthTokenSecret?: string;
+    accessToken?: string;
+    accessSecret?: string;
     me?: User;
   }
 }
