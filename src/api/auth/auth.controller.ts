@@ -38,7 +38,11 @@ const callback = async (req: Request<null, { oauth_verifier: string }>, res: Res
 
     const { client, accessToken, accessSecret } = await twitter.login(oauth_verifier);
 
-    const twitterMe = await client.currentUser();
+    const twitterMe = await client.v1.verifyCredentials();
+
+    if (config.USERS !== '*' && !config.USERS.includes(twitterMe.id_str)) {
+      return res.redirect(config.STOP);
+    }
 
     req.session.me = mapUserV1(twitterMe);
     res

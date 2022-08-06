@@ -10,6 +10,7 @@ import { createConnection } from 'mysql2/promise';
 import { createClient, RedisClientType } from 'redis';
 
 import auth from './api/auth';
+import images from './api/images';
 import result from './api/result';
 import tweet from './api/tweet';
 import user from './api/user';
@@ -84,6 +85,7 @@ app.use(redis(redisClient));
 app.use(middleware.handle(i18next));
 
 app.use('/api/auth', auth);
+app.use('/api/images', images);
 
 app.use(twitter);
 
