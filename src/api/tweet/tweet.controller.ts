@@ -1,10 +1,10 @@
 import HttpException, { ForbiddenException, UnauthorizedException } from '../../exception';
-import { Request, Response } from '../../model';
+import { Request, Response, Tweet } from '../../model';
 import resultService from '../result/result.service';
 import userService from '../user/user.service';
 import tweetService from './tweet.service';
 
-const sendTweet = async (req: Request<any, any, { tweetId: string }>, res: Response) => {
+const sendTweet = async (req: Request<any, any, { tweetId: string }>, res: Response<Tweet>) => {
   try {
     const { tweetId } = req.params;
     const t = req.t;
@@ -23,9 +23,9 @@ const sendTweet = async (req: Request<any, any, { tweetId: string }>, res: Respo
     }
 
     const image = await tweetService.createImage(req, result);
-    await tweetService.sendTweet(req, image);
+    const tweet = await tweetService.sendTweet(req, image);
 
-    res.send();
+    res.send(tweet);
   } catch (error: any) {
     const { message, stack, logout, verbose } = error;
     if (error instanceof HttpException) {

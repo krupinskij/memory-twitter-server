@@ -42,6 +42,10 @@ export type User = {
   pp?: string;
 };
 
+export type Tweet = {
+  id: string;
+};
+
 export enum Level {
   Easy = 'easy',
   Medium = 'medium',

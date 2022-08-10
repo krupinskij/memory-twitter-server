@@ -4,11 +4,11 @@ import * as PImage from 'pureimage';
 import { Bitmap } from 'pureimage/types/bitmap';
 import { Context } from 'pureimage/types/context';
 import { PassThrough } from 'stream';
-import { EUploadMimeType, TweetV1 } from 'twitter-api-v2';
+import { EUploadMimeType } from 'twitter-api-v2';
 
 import { BadRequestException, UnauthorizedException } from '../../exception';
-import { Request } from '../../model';
-import { encodeProfilePicture, formatTime } from '../../utils';
+import { Request, Tweet } from '../../model';
+import { encodeProfilePicture, formatTime, mapTweetV1 } from '../../utils';
 import { ResultDB } from '../result/result.model';
 import userService from '../user/user.service';
 import { TextInfo } from './tweet.model';
@@ -84,7 +84,7 @@ const writeText = (textInfo: TextInfo[], fontSize: number, height: number, conte
   });
 };
 
-const sendTweet = async (req: Request, image: Bitmap): Promise<TweetV1> => {
+const sendTweet = async (req: Request, image: Bitmap): Promise<Tweet> => {
   const twitter = req.twitter;
   const t = req.t;
 
@@ -96,7 +96,7 @@ const sendTweet = async (req: Request, image: Bitmap): Promise<TweetV1> => {
   const mediaId = await twitter.v1.uploadMedia(buffer, { mimeType: EUploadMimeType.Png });
   const tweet = await twitter.v1.tweet(t('tweet:status'), { media_ids: [mediaId] });
 
-  return tweet;
+  return mapTweetV1(tweet);
 };
 
 const encodeBitmapIntoBuffer = async (canvas: Bitmap) => {

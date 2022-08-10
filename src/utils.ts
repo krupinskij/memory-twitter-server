@@ -1,6 +1,6 @@
-import { UserV1, UserV2 } from 'twitter-api-v2';
+import { TweetV1, UserV1, UserV2 } from 'twitter-api-v2';
 
-import { Level, User } from './model';
+import { Level, Tweet, User } from './model';
 
 export const mapUserV1 = (user: UserV1): User => ({
   id: user.id_str,
@@ -34,6 +34,10 @@ export const encodeProfilePicture = (
 
   return `https://abs.twimg.com/sticky/default_profile_images/default_profile${format}.png`;
 };
+
+export const mapTweetV1 = (tweet: TweetV1): Tweet => ({
+  id: tweet.id_str,
+});
 
 export const formatTime = (time: number) => {
   const ms = time;
