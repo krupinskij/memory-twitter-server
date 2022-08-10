@@ -5,5 +5,6 @@
   "no-followings": "You don't have enough followings.",
   "error-occured": "An error occured. Try later.",
   "not-tweet": "An error occured. You cannot send tweet now.",
-  "not-your-result'": "It is not your result."
+  "not-your-result": "It is not your result.",
+  "already-tweeted": "You already tweeted about this result."
 }

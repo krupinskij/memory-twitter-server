@@ -21,11 +21,19 @@ const sendTweet = async (req: Request<any, any, { tweetId: string }>, res: Respo
     if (result.userId !== me.id) {
       throw new ForbiddenException(t('errors:not-your-result'));
     }
+    if (result.tweeted) {
+      throw new ForbiddenException(t('errors:already-tweeted'));
+    }
 
+    await resultService.setResultTweeted(req, result, true);
     const image = await tweetService.createImage(req, result);
-    const tweet = await tweetService.sendTweet(req, image);
-
-    res.send(tweet);
+    try {
+      const tweet = await tweetService.sendTweet(req, image);
+      res.send(tweet);
+    } catch (err) {
+      await resultService.setResultTweeted(req, result, false);
+      throw err;
+    }
   } catch (error: any) {
     const { message, stack, logout, verbose } = error;
     if (error instanceof HttpException) {

@@ -3,15 +3,7 @@ import dayjs from 'dayjs';
 import HttpException, { BadRequestException, UnauthorizedException } from '../../exception';
 import { Request, Response } from '../../model';
 import userService from '../user/user.service';
-import {
-  AddResultQuery,
-  GetResultQuery,
-  IDDB,
-  Result,
-  ResultDB,
-  UserResult,
-  Users,
-} from './result.model';
+import { AddResultQuery, GetResultQuery, IDDB, Result, UserResult, Users } from './result.model';
 import resultService from './result.service';
 
 const addResult = async (req: Request<UserResult, AddResultQuery>, res: Response) => {
@@ -37,8 +29,8 @@ const addResult = async (req: Request<UserResult, AddResultQuery>, res: Response
       await mysql.execute('SET @id := UUID_TO_BIN(UUID(), true);');
       await mysql.execute(
         `
-        INSERT INTO result_${level}(id, userId, time, clicks, level, createdAt) 
-        VALUES(@id, ?, ?, ?, ?, ?)
+        INSERT INTO t_result_${level}(id, userId, time, clicks, level, tweeted, createdAt) 
+        VALUES(@id, ?, ?, ?, ?, false, ?)
         `,
         [me.id, time, clicks, level, now.unix()]
       );

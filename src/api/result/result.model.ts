@@ -35,6 +35,7 @@ export type ResultDB = RowDataPacket & {
   clicks: number;
   time: number;
   level: string;
+  tweeted: boolean;
   createdAt: number;
 };
 

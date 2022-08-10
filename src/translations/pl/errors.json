@@ -5,5 +5,6 @@
   "no-followings": "Nie masz wystarczającej liczby obserwowanych.",
   "error-occured": "Wystąpił błąd. Spróbuj za parę minut.",
   "not-tweet": "Wystąpił błąd. Nie można wysłać tweeta teraz.",
-  "not-your-result": "To nie jest twój wynik."
+  "not-your-result": "To nie jest twój wynik.",
+  "already-tweeted": "Wysłałeś już tweeta na temat tego wyniku."
 }
