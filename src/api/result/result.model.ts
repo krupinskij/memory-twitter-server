@@ -22,6 +22,10 @@ export type AddResultQuery = {
   level: Level;
 };
 
+export type GetResultParam = {
+  resultId: string;
+};
+
 export type GetResultQuery = {
   level: Level;
   order: Order;
@@ -34,7 +38,7 @@ export type ResultDB = RowDataPacket & {
   userId: string;
   clicks: number;
   time: number;
-  level: string;
+  level: Level;
   tweeted: boolean;
   createdAt: number;
 };

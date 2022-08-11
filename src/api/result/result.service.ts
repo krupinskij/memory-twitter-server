@@ -1,13 +1,9 @@
 import { BadRequestException } from '../../exception';
 import { Request } from '../../model';
-import { QueryLevel } from '../user/user.model';
+import { encodeResultId, mapResult } from '../../utils';
 import { Order, ResultDB } from './result.model';
 
-const findResultById = async (
-  req: Request<any, QueryLevel>,
-  resultId: string
-): Promise<ResultDB> => {
-  const { level } = req.query;
+const findResultById = async (req: Request, resultId: string): Promise<ResultDB> => {
   const mysql = req.mysql;
   const t = req.t;
 
@@ -16,14 +12,15 @@ const findResultById = async (
   }
 
   try {
+    const [id, level] = encodeResultId(resultId);
     const [results] = await mysql.execute<ResultDB[]>(
       `
       SELECT * FROM result_${level} 
-      WHERE id = "${resultId}"
+      WHERE id = "${id}"
     `
     );
 
-    return results[0];
+    return mapResult(results[0]);
   } catch (err) {
     throw new BadRequestException(t('errors:error-occured'));
   }
@@ -58,7 +55,7 @@ const findResultsByIds = async (req: Request, userIds: string[]): Promise<Result
       `
     );
 
-    return results;
+    return results.map(mapResult);
   } catch (err) {
     throw new BadRequestException(t('errors:error-occured'));
   }
@@ -111,7 +108,7 @@ const findResultsByIdsAfterResult = async (
     `
     );
 
-    return results;
+    return results.map(mapResult);
   } catch (err) {
     throw new BadRequestException(t('errors:error-occured'));
   }
@@ -129,9 +126,9 @@ const setResultTweeted = async (
     throw new BadRequestException(t('errors:error-occured'));
   }
 
-  const { id, level } = result;
-
+  const { id: resultId, level } = result;
   try {
+    const [id] = encodeResultId(resultId);
     await mysql.execute(
       `
         UPDATE result_${level}

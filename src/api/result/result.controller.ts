@@ -1,9 +1,24 @@
 import dayjs from 'dayjs';
 
-import HttpException, { BadRequestException, UnauthorizedException } from '../../exception';
+import HttpException, {
+  BadRequestException,
+  ForbiddenException,
+  UnauthorizedException,
+} from '../../exception';
+import NotFoundException from '../../exception/not-found.exception';
 import { Request, Response } from '../../model';
+import { decodeResultId } from '../../utils';
 import userService from '../user/user.service';
-import { AddResultQuery, GetResultQuery, IDDB, Result, UserResult, Users } from './result.model';
+import {
+  AddResultQuery,
+  GetResultParam,
+  GetResultQuery,
+  IDDB,
+  Result,
+  ResultDB,
+  UserResult,
+  Users,
+} from './result.model';
 import resultService from './result.service';
 
 const addResult = async (req: Request<UserResult, AddResultQuery>, res: Response) => {
@@ -23,7 +38,7 @@ const addResult = async (req: Request<UserResult, AddResultQuery>, res: Response
     }
 
     const now = dayjs();
-    let lastId: string | undefined;
+    let id: string | undefined;
     try {
       await mysql.beginTransaction();
       await mysql.execute('SET @id := UUID_TO_BIN(UUID(), true);');
@@ -36,13 +51,50 @@ const addResult = async (req: Request<UserResult, AddResultQuery>, res: Response
       );
       const [data] = await mysql.execute<IDDB[]>('SELECT BIN_TO_UUID(@id) as id;');
       await mysql.commit();
-      lastId = data[0]?.id;
+      id = decodeResultId(data[0]?.id, level);
     } catch (err) {
       await mysql.rollback();
       throw new BadRequestException(t('errors:error-occured'));
     }
 
-    res.send({ id: lastId });
+    res.send({ id });
+  } catch (error: any) {
+    const { message, stack, logout, verbose } = error;
+    if (error instanceof HttpException) {
+      return res.status(error.httpStatus).send({ message, logout, verbose });
+    }
+
+    res.status(500).send({
+      originMessage: message,
+      message: req.t('errors:something-happened'),
+      verbose: true,
+      stack,
+    });
+  }
+};
+
+const getResult = async (req: Request<any, any, GetResultParam>, res: Response<ResultDB>) => {
+  try {
+    const { resultId } = req.params;
+    const mysql = req.mysql;
+    const t = req.t;
+
+    if (!mysql) {
+      throw new BadRequestException(t('errors:error-occured'));
+    }
+
+    const me = await userService.me(req);
+
+    const result = await resultService.findResultById(req, resultId);
+
+    if (!result) {
+      throw new NotFoundException(t('errors:no-result'));
+    }
+    if (result.userId !== me.id) {
+      throw new ForbiddenException(t('errors:not-your-result'));
+    }
+
+    res.send(result);
   } catch (error: any) {
     const { message, stack, logout, verbose } = error;
     if (error instanceof HttpException) {
@@ -118,4 +170,8 @@ const getResults = async (req: Request<any, GetResultQuery>, res: Response<Resul
   }
 };
 
-export default { addResult, getResults };
+export default {
+  addResult,
+  getResult,
+  getResults,
+};

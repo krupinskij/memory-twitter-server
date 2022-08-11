@@ -1,5 +1,6 @@
 import { TweetV1, UserV1, UserV2 } from 'twitter-api-v2';
 
+import { ResultDB } from './api/result/result.model';
 import { Level, Tweet, User } from './model';
 
 export const mapUserV1 = (user: UserV1): User => ({
@@ -70,4 +71,41 @@ export const getRandomIndexes = (count: number, maxIndex: number): number[] => {
 
 export const isValidLevel = (level: any): level is Level => {
   return Object.values(Level).includes(level);
+};
+
+export const mapResult = (result: ResultDB): ResultDB => ({
+  ...result,
+  id: decodeResultId(result.id, result.level),
+  tweeted: !!result.tweeted,
+});
+
+export const decodeResultId = (resultId: string, level: Level) => {
+  switch (level) {
+    case Level.Easy:
+      return `0${resultId}`;
+    case Level.Medium:
+      return `1${resultId}`;
+    case Level.Hard:
+      return `2${resultId}`;
+    case Level.Legendary:
+      return `3${resultId}`;
+  }
+};
+
+export const encodeResultId = (decodedResultId: string = ''): [string, Level] => {
+  const levelId = decodedResultId[0];
+  const resultId = decodedResultId.substring(1);
+
+  switch (levelId) {
+    case '0':
+      return [resultId, Level.Easy];
+    case '1':
+      return [resultId, Level.Medium];
+    case '2':
+      return [resultId, Level.Hard];
+    case '3':
+      return [resultId, Level.Legendary];
+    default:
+      return [resultId, Level.Easy];
+  }
 };

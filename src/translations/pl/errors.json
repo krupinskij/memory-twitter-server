@@ -6,5 +6,6 @@
   "error-occured": "Wystąpił błąd. Spróbuj za parę minut.",
   "not-tweet": "Wystąpił błąd. Nie można wysłać tweeta teraz.",
   "not-your-result": "To nie jest twój wynik.",
-  "already-tweeted": "Wysłałeś już tweeta na temat tego wyniku."
+  "already-tweeted": "Wysłałeś już tweeta na temat tego wyniku.",
+  "no-result": "Nie znaleziono wyniku."
 }
