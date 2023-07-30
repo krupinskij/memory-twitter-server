@@ -10,9 +10,12 @@ import { createConnection } from 'mysql2/promise';
 import { createClient, RedisClientType } from 'redis';
 
 import auth from './api/auth';
+import images from './api/images';
 import result from './api/result';
+import tweet from './api/tweet';
 import user from './api/user';
 import config from './config';
+import canvas from './middleware/canvas';
 import mysql from './middleware/mysql';
 import redis from './middleware/redis';
 import twitter from './middleware/twitter';
@@ -20,7 +23,10 @@ import { User } from './model';
 
 declare module 'express-session' {
   interface SessionData {
-    codeVerifier?: string;
+    oauthToken?: string;
+    oauthTokenSecret?: string;
+    accessToken?: string;
+    accessSecret?: string;
     me?: User;
   }
 }
@@ -46,7 +52,7 @@ i18next
   .init({
     fallbackLng: 'en',
     load: 'languageOnly',
-    ns: ['errors'],
+    ns: ['errors', 'tweet'],
     backend: {
       loadPath: './src/translations/{{lng}}/{{ns}}.json',
       crossDomain: true,
@@ -81,11 +87,16 @@ app.use(redis(redisClient));
 app.use(middleware.handle(i18next));
 
 app.use('/api/auth', auth);
+app.use('/api/images', images);
 
 app.use(twitter);
 
 app.use('/api/result', result);
 app.use('/api/user', user);
+
+app.use(canvas);
+
+app.use('/api/tweet', tweet);
 
 app.listen(PORT, () => {
   console.log(`App started on port ${PORT}`);

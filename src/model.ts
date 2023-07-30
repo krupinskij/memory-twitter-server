@@ -1,6 +1,8 @@
 import { Request as ExpressRequest, Response as ExpressResponse } from 'express';
 import * as core from 'express-serve-static-core';
 import { Connection } from 'mysql2/promise';
+import { Bitmap } from 'pureimage/types/bitmap';
+import { Context } from 'pureimage/types/context';
 import { RedisClientType } from 'redis';
 import { TwitterApi } from 'twitter-api-v2';
 
@@ -9,6 +11,10 @@ export interface Request<ReqBody = any, ReqQuery = qs.ParsedQs, ReqParams = core
   twitter?: TwitterApi;
   redis?: RedisClientType;
   mysql?: Connection;
+  canvas?: {
+    context: Context;
+    image: Bitmap;
+  };
 }
 
 export type ResponseBody<BodyType> =
@@ -34,6 +40,10 @@ export type User = {
   un: string;
   nm: string;
   pp?: string;
+};
+
+export type Tweet = {
+  id: string;
 };
 
 export enum Level {

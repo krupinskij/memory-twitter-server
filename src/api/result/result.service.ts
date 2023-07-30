@@ -1,9 +1,9 @@
 import { BadRequestException } from '../../exception';
 import { Request } from '../../model';
+import { encodeResultId, mapResult } from '../../utils';
 import { Order, ResultDB } from './result.model';
 
 const findResultById = async (req: Request, resultId: string): Promise<ResultDB> => {
-  const { level } = req.query;
   const mysql = req.mysql;
   const t = req.t;
 
@@ -12,15 +12,15 @@ const findResultById = async (req: Request, resultId: string): Promise<ResultDB>
   }
 
   try {
+    const [id, level] = encodeResultId(resultId);
     const [results] = await mysql.execute<ResultDB[]>(
       `
-      SELECT BIN_TO_UUID(id) as id, userId, clicks, time, createdAt 
-      FROM result_${level} 
-      WHERE BIN_TO_UUID(id) = "${resultId}"
+      SELECT * FROM result_${level} 
+      WHERE id = "${id}"
     `
     );
 
-    return results[0];
+    return mapResult(results[0]);
   } catch (err) {
     throw new BadRequestException(t('errors:error-occured'));
   }
@@ -48,15 +48,14 @@ const findResultsByIds = async (req: Request, userIds: string[]): Promise<Result
   try {
     const [results] = await mysql.execute<ResultDB[]>(
       `
-      SELECT BIN_TO_UUID(id) as id, userId, clicks, time, createdAt 
-      FROM result_${level} 
+      SELECT * FROM result_${level} 
       WHERE userId IN (${userIds.join(',')})
       ${orderStatement}
       LIMIT 20;
       `
     );
 
-    return results;
+    return results.map(mapResult);
   } catch (err) {
     throw new BadRequestException(t('errors:error-occured'));
   }
@@ -102,15 +101,41 @@ const findResultsByIdsAfterResult = async (
   try {
     const [results] = await mysql.execute<ResultDB[]>(
       `
-      SELECT BIN_TO_UUID(id) as id, userId, clicks, time, createdAt 
-      FROM result_${level} 
+      SELECT * FROM result_${level} 
       WHERE userId IN (${userIds.join(',')})
       ${orderStatement}
       LIMIT 20;
     `
     );
 
-    return results;
+    return results.map(mapResult);
+  } catch (err) {
+    throw new BadRequestException(t('errors:error-occured'));
+  }
+};
+
+const setResultTweeted = async (
+  req: Request,
+  result: ResultDB,
+  tweeted: boolean
+): Promise<void> => {
+  const mysql = req.mysql;
+  const t = req.t;
+
+  if (!mysql) {
+    throw new BadRequestException(t('errors:error-occured'));
+  }
+
+  const { id: resultId, level } = result;
+  try {
+    const [id] = encodeResultId(resultId);
+    await mysql.execute(
+      `
+        UPDATE result_${level}
+        SET tweeted = ${tweeted}
+        WHERE id = "${id}"
+      `
+    );
   } catch (err) {
     throw new BadRequestException(t('errors:error-occured'));
   }
@@ -120,4 +145,5 @@ export default {
   findResultById,
   findResultsByIds,
   findResultsByIdsAfterResult,
+  setResultTweeted,
 };

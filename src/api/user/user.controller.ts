@@ -56,7 +56,7 @@ const getFollowings = async (req: Request<any, QueryLevel>, res: Response<User[]
     const t = req.t;
 
     if (!isValidLevel(level)) {
-      throw new BadRequestException(t('errros:no-level'));
+      throw new BadRequestException(t('errors:no-level'));
     }
 
     const followingsToRead = MapLevel[level];
@@ -66,7 +66,7 @@ const getFollowings = async (req: Request<any, QueryLevel>, res: Response<User[]
     const followingsLength = followings.length;
 
     if (followingsLength < followingsToRead) {
-      throw new BadRequestException(t('errros:no-followings'));
+      throw new BadRequestException(t('errors:no-followings'));
     }
 
     const randomIndexes = getRandomIndexes(followingsToRead, followingsLength);

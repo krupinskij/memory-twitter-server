@@ -5,41 +5,20 @@ import config from '../config';
 import { Request } from '../model';
 
 const twitter = async (req: Request, res: Response, next: NextFunction) => {
-  const accessToken = req.cookies['access-token'];
-  const refreshToken = req.cookies['refresh-token'];
+  const { accessToken, accessSecret } = req.session;
 
-  if (!accessToken && !refreshToken) {
+  if (!accessToken || !accessSecret) {
     delete req.twitter;
     return next();
   }
 
-  if (!accessToken) {
-    const client = new TwitterApi({
-      clientId: config.CLIENT_ID,
-      clientSecret: config.CLIENT_SECRET,
-    });
-    const {
-      client: refreshedClient,
-      accessToken: newAccessToken,
-      refreshToken: newRefreshToken,
-      expiresIn,
-    } = await client.refreshOAuth2Token(refreshToken as string);
-
-    req.twitter = refreshedClient;
-    res
-      .cookie('access-token', newAccessToken, {
-        maxAge: expiresIn * 1000,
-        httpOnly: true,
-        secure: true,
-      })
-      .cookie('refresh-token', newRefreshToken, {
-        maxAge: 60 * 60 * 1000,
-        httpOnly: true,
-        secure: true,
-      });
-  } else {
-    req.twitter = new TwitterApi(accessToken);
-  }
+  const twitter = new TwitterApi({
+    appKey: config.API_KEY,
+    appSecret: config.API_KEY_SECRET,
+    accessToken,
+    accessSecret,
+  });
+  req.twitter = twitter;
 
   next();
 };

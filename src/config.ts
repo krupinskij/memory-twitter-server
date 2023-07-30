@@ -16,6 +16,9 @@ const config = {
   CALLBACK: process.env.CALLBACK || '',
   REDIRECT: process.env.REDIRECT || '',
 
+  USERS: process.env.USERS === '*' ? '*' : process.env.USERS?.split(',') || '*',
+  STOP: process.env.STOP || '',
+
   REDIS_HOSTNAME: process.env.REDIS_HOSTNAME || 'localhost',
   REDIS_PORT: process.env.REDIS_PORT || 6379,
 

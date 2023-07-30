@@ -3,5 +3,9 @@
   "something-happened": "Something bad happened :/",
   "no-level": "There is no such level.",
   "no-followings": "You don't have enough followings.",
-  "error-occured": "An error occured. Try later."
+  "error-occured": "An error occured. Try later.",
+  "not-tweet": "An error occured. You cannot send tweet now.",
+  "not-your-result": "It is not your result.",
+  "already-tweeted": "You already tweeted about this result.",
+  "no-result": "Result not found."
 }

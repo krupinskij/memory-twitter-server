@@ -2,62 +2,52 @@ import { TwitterApi } from 'twitter-api-v2';
 
 import config from '../../config';
 import { Request, Response } from '../../model';
-import { mapUser } from '../../utils';
+import { mapUserV1 } from '../../utils';
 
 const link = async (req: Request, res: Response<{ url: string }>) => {
   const twitter = new TwitterApi({
-    clientId: config.CLIENT_ID,
-    clientSecret: config.CLIENT_SECRET,
+    appKey: config.API_KEY,
+    appSecret: config.API_KEY_SECRET,
   });
 
-  const { url, codeVerifier } = twitter.generateOAuth2AuthLink(config.CALLBACK, {
-    scope: ['tweet.read', 'users.read', 'follows.read', 'offline.access'],
-  });
+  const { url, oauth_token, oauth_token_secret } = await twitter.generateAuthLink(config.CALLBACK);
 
-  req.session.codeVerifier = codeVerifier;
+  req.session.oauthToken = oauth_token;
+  req.session.oauthTokenSecret = oauth_token_secret;
+
   res.send({ url });
 };
 
-const callback = async (req: Request, res: Response) => {
-  const twitter = new TwitterApi({
-    clientId: config.CLIENT_ID,
-    clientSecret: config.CLIENT_SECRET,
-  });
+const callback = async (req: Request<null, { oauth_verifier: string }>, res: Response) => {
+  const { oauth_verifier } = req.query;
+  const { oauthToken, oauthTokenSecret } = req.session;
 
-  const { code, state } = req.query;
-  const { codeVerifier } = req.session;
-
-  if (!code || !state || !codeVerifier) {
+  if (!oauth_verifier || !oauthToken || !oauthTokenSecret) {
     return res
       .status(400)
       .send({ data: null, message: 'You denied the app or your session expired!' });
   }
 
   try {
-    const { accessToken, refreshToken, expiresIn } = await twitter.loginWithOAuth2({
-      code: code as string,
-      codeVerifier,
-      redirectUri: config.CALLBACK,
+    const twitter = new TwitterApi({
+      appKey: config.API_KEY,
+      appSecret: config.API_KEY_SECRET,
+      accessToken: oauthToken,
+      accessSecret: oauthTokenSecret,
     });
 
-    const twitterAccess = new TwitterApi(accessToken);
-    const { data: twitterMe } = await twitterAccess.v2.me({
-      'user.fields': ['name', 'profile_image_url'],
-    });
+    const { client, accessToken, accessSecret } = await twitter.login(oauth_verifier);
 
-    req.session.me = mapUser(twitterMe);
-    res
-      .cookie('access-token', accessToken, {
-        maxAge: expiresIn * 1000,
-        httpOnly: true,
-        secure: true,
-      })
-      .cookie('refresh-token', refreshToken, {
-        maxAge: 60 * 60 * 1000,
-        httpOnly: true,
-        secure: true,
-      })
-      .redirect(config.REDIRECT);
+    const twitterMe = await client.v1.verifyCredentials();
+
+    if (config.USERS !== '*' && !config.USERS.includes(twitterMe.id_str)) {
+      return res.redirect(config.STOP);
+    }
+
+    req.session.me = mapUserV1(twitterMe);
+    req.session.accessToken = accessToken;
+    req.session.accessSecret = accessSecret;
+    res.redirect(config.REDIRECT);
   } catch (err) {
     res.status(403).send({ verbose: false, message: 'Invalid verifier or access tokens!' });
   }
@@ -65,7 +55,7 @@ const callback = async (req: Request, res: Response) => {
 
 const logout = async (req: Request, res: Response<true>) => {
   req.session.destroy(() => {});
-  res.clearCookie('access-token').clearCookie('refresh-token').send(true);
+  res.send(true);
 };
 
 export default {

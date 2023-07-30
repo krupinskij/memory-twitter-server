@@ -18,10 +18,12 @@
     "dotenv": "^16.0.1",
     "express": "4.17.3",
     "express-session": "1.17.2",
+    "https": "^1.0.0",
     "i18next": "^21.8.14",
     "i18next-fs-backend": "^1.1.4",
     "i18next-http-middleware": "^3.2.1",
     "mysql2": "^2.3.3",
+    "pureimage": "^0.3.14",
     "redis": "^4.1.0",
     "twitter-api-v2": "^1.12.2"
   },

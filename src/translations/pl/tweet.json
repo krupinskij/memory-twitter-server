@@ -1,0 +1,36 @@
+{
+  "status": "Zagraj ze mną: memorytwitter.com",
+  "game-finished": [{ "bold": true, "text": "Ukończyłam/em grę" }],
+  "level_easy": [
+    { "bold": false, "text": "na poziomie" },
+    { "bold": true, "text": "łatwym." }
+  ],
+  "level_medium": [
+    { "bold": false, "text": "na poziomie" },
+    { "bold": true, "text": "średnim." }
+  ],
+  "level_hard": [
+    { "bold": false, "text": "na poziomie" },
+    { "bold": true, "text": "trudnym." }
+  ],
+  "level_legendary": [
+    { "bold": false, "text": "na poziomie" },
+    { "bold": true, "text": "legendarnym." }
+  ],
+  "clicks_one": [
+    { "bold": false, "text": "Wykonałam/em" },
+    { "bold": true, "text": "{{ clicks }} kliknięcie" }
+  ],
+  "clicks_few": [
+    { "bold": false, "text": "Wykonałam/em" },
+    { "bold": true, "text": "{{ clicks }} kliknięcia" }
+  ],
+  "clicks_many": [
+    { "bold": false, "text": "Wykonałam/em" },
+    { "bold": true, "text": "{{ clicks }} kliknięć" }
+  ],
+  "time": [
+    { "bold": false, "text": "w" },
+    { "bold": true, "text": "{{ time }}." }
+  ]
+}
