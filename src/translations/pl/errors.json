@@ -1,0 +1,11 @@
+{
+  "not-logged": "Nie jesteś zalogowany.",
+  "something-happened": "Coś się popsuło :/",
+  "no-level": "Nie ma takiego poziomu.",
+  "no-followings": "Nie masz wystarczającej liczby obserwowanych.",
+  "error-occured": "Wystąpił błąd. Spróbuj za parę minut.",
+  "not-tweet": "Wystąpił błąd. Nie można wysłać tweeta teraz.",
+  "not-your-result": "To nie jest twój wynik.",
+  "already-tweeted": "Wysłałeś już tweeta na temat tego wyniku.",
+  "no-result": "Nie znaleziono wyniku."
+}

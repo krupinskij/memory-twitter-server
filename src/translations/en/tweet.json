@@ -1,0 +1,21 @@
+{
+  "status": "Play with me: memorytwitter.com",
+  "game-finished": [{ "bold": true, "text": "I've finished the game" }],
+  "level": [
+    { "bold": false, "text": "on" },
+    { "bold": true, "text": "{{ level }}" },
+    { "bold": false, "text": "level." }
+  ],
+  "clicks_one": [
+    { "bold": false, "text": "I've made" },
+    { "bold": true, "text": "{{ clicks }} click" }
+  ],
+  "clicks_other": [
+    { "bold": false, "text": "I've made" },
+    { "bold": true, "text": "{{ clicks }} clicks" }
+  ],
+  "time": [
+    { "bold": false, "text": "in" },
+    { "bold": true, "text": "{{ time }}." }
+  ]
+}

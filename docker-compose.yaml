@@ -1,0 +1,31 @@
+version: '3.8'
+services:
+  mysql:
+    image: mysql:8.0.29-oracle
+    container_name: mt_mysql_c
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'db'
+      MYSQL_USER: 'user'
+      MYSQL_PASSWORD: 'password'
+      MYSQL_ROOT_PASSWORD: 'password'
+    ports:
+      - '3306:3306'
+    volumes:
+      - db:/var/lib/mysql
+      - ./scripts:/docker-entrypoint-initdb.d
+  redis:
+    image: redislabs/rejson:2.0.8
+    container_name: mt_redis_c
+    restart: always
+    command: redis-server /usr/src/redis/redis.conf --loadmodule /usr/lib/redis/modules/rejson.so
+    ports:
+      - '6379:6379'
+    volumes:
+      - ./redis.conf:/usr/src/redis/redis.conf
+      - cache:/data
+
+volumes:
+  cache:
+    driver: local
+  db:
